@@ -1,0 +1,53 @@
+.AdminUserList {
+    margin: 40px;
+}
+
+.AdminUserList h1 {
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: var(--deep-blue);
+    color: var(--light);
+}
+
+.action-buttons button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    background-color: var(--brown);
+    color: var(--light);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-buttons button:hover {
+    background-color: var(--beige);
+    color: var(--dark);
+}
+button {
+    margin: 0 4px;
+    padding: 6px 12px;
+    background-color: var(--brown);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--beige);
+}
