@@ -1,8 +1,9 @@
 import React from 'react';
 import './Cart.css';
+import mockData from '../../data/mockdata.json';
 
 const Cart = ({ productIds, setProductIds }) => {
-    const cartItems = null; //mockData.filter((item) => productIds.includes(item.id));
+    const cartItems = mockData.filter((item) => productIds.includes(item.id));
     const total = cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2);
 
     return (
