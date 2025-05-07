@@ -3,8 +3,6 @@ import './Login.css';
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = process.env.API_URL;
-
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
