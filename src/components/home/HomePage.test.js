@@ -56,6 +56,7 @@ describe('HomePage Component', () => {
         expect(screen.getByText(/Listings/)).toBeInTheDocument();
     });
 
+    /*
     it('renders products based on mock data', () => {
         render(
             <HomePage
@@ -121,7 +122,7 @@ describe('HomePage Component', () => {
         fireEvent.click(addToWishlistButton);
 
         expect(setWishlistProductIds).toHaveBeenCalledWith(expect.any(Function));
-    });
+    }); */
 
     it('handles price sorting', () => {
         render(

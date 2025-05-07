@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import './Register.css';
 import {useNavigate} from "react-router-dom";
-function Register() {    
+
+
+
+function Register() {
     const [email, setEmail] = useState("");    
     const [username, setUsername] = useState("");    
     const [password, setPassword] = useState("");    
@@ -27,25 +30,24 @@ function Register() {
         if (!validatePassword(password)) newErrors.password = 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number';        
         if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match'; 
         
-        setErrors(newErrors);       
+        setErrors(newErrors);
         
         try {            
-            const response = await fetch('http://localhost:5208/api/auth/register', {                
+            const response = await fetch(`http://localhost:8080/api/auth/register`, {
                 method: 'POST',                
-                headers: {                    
-                    'Content-Type': 'application/json',                
-                },                
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({                    
-                    username,                    
-                    password,                    
-                    email: { value: email }                
+                    username: username,
+                    password: password,
+                    email: email,
+                    role: "user"
                 }),           
             });            
-            if (response.ok) {                
-                const data = await response.json();                
-                console.log('Registration successful:', data);                
-                navigate('/login');           
-            } else {                
+            if (response.status === 200) {
+                navigate('/login');
+            } else {
                 const errorData = await response.json();                
                 setErrors({ server: errorData.message });                
                 console.error('Registration failed:', errorData);            
