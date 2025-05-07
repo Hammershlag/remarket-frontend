@@ -1,9 +1,8 @@
 import React from 'react';
 import './Wishlist.css';
-import mockData from '../../data/mockdata.json';
 
 function Wishlist({ productIds, setProductIds, setCartProductIds }) {
-    const wishlistItems = mockData.filter((item) => productIds.includes(item.id));
+    const wishlistItems = null; //mockData.filter((item) => productIds.includes(item.id));
 
     const handleAddToCart = (productId) => {
         setCartProductIds((prevProducts) => [...prevProducts,productId])

@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
 import './HomePage.css';
-import mockData from '../../data/mockdata.json';
 
 function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWishlistProductIds }) {
     const [categories, setCategories] = React.useState([]);
@@ -11,7 +10,7 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
     const [reviewSort, setReviewSort] = React.useState('none'); // 'most', 'least' or 'none'
 
     const fetchListings = useCallback(() => {
-        let data = mockData;
+        let data = null;
 
         data = data.filter(
             (item) =>

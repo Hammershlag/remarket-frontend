@@ -5,11 +5,11 @@ import Navbar from './components/navbar/Navbar';
 import Cart from './components/cart/Cart';
 import Wishlist from './components/wishlist/Wishlist';
 import Account from './components/account/Account';
-import Register from "./components/account/Register";
-import Login from "./components/account/Login";
+import Register from "./components/auth/Register";
+import Login from "./components/auth/Login";
 import HomePage from "./components/home/HomePage";
 import PrivateRoute from "./components/PrivateRoute";
-import AdminUserList from './components/account/AdminUser'; // 👈 keep or rename as discussed
+import AdminUserList from './components/account/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
 
@@ -81,5 +81,3 @@ function App() {
 }
 
 export default App;
-
-/* TODO: create App.test.js file in the src directory */

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import './Register.css';
+import './Auth.css';
 import {useNavigate} from "react-router-dom";
-
 
 
 function Register() {
@@ -31,6 +30,10 @@ function Register() {
         if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match'; 
         
         setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
         
         try {            
             const response = await fetch(`http://localhost:8080/api/auth/register`, {
@@ -57,50 +60,58 @@ function Register() {
         }    
     };    
     
-    return (        
-        <form className="Register" onSubmit={handleSubmit}>            
-            <h1>Fill out the form to create an account:</h1>           
-            <div>                
-                <label>Username:</label>                
-                <input                    
-                    type="text"                    
-                    value={username}                    
-                    onChange={(e) => setUsername(e.target.value)}                
-                />                
-                {errors.username && <p className="error">{errors.username}</p>}            
-            </div>           
-            <div>                
-                <label>Email:</label>               
-                <input                    
-                    type="email"                    
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}                
-                />                
-                {errors.email && <p className="error">{errors.email}</p>}           
-            </div>           
-            <div>                
-                <label>Password:</label>               
-                <input                    
-                    type="password"                    
-                    value={password}                    
-                    onChange={(e) => setPassword(e.target.value)}                
-                />                
-                {errors.password && <p className="error">{errors.password}</p>}            
-            </div>           
-            <div>                
-                <label>Confirm Password:</label>                
-                <input                  
-                    type="password"                
-                    value={confirmPassword}               
-                    onChange={(e) => setConfirmPassword(e.target.value)}     
-                />           
-                {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}   
-            </div>          
-            {errors.server && <p className="error">{errors.server}</p>}     
-            <button type="submit">Register</button>        
-            <br/>     
-            Already have an account? <a href="/login">Sign in</a>      
-        </form>  
+    return (
+        <div className="AuthPage">
+            <div className="SideImage left"></div>
+            <form className="AuthForm" onSubmit={handleSubmit}>
+                <h1>Fill out the form to create an account</h1>
+                <div style={{ display: 'none' }}>
+                    <label>Placeholder</label>
+                    <input type="text"/>
+                </div>
+                <div>
+                    <label>Username:</label>
+                    <input className="RegisterInput"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </div>
+                {errors.username && <p className="error">{errors.username}</p>}
+                <div>
+                    <label>Email:</label>
+                    <input className="RegisterInput"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                {errors.email && <p className="error">{errors.email}</p>}
+                <div>
+                    <label>Password:</label>
+                    <input className="RegisterInput"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+                {errors.password && <p className="error">{errors.password}</p>}
+                <div>
+                    <label>Confirm Password:</label>
+                    <input className="RegisterInput"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                </div>
+                {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+                {errors.server && <p className="error">{errors.server}</p>}
+                <button type="submit">Register</button>
+                <br/>
+                Already have an account? <a href="/login">Sign in</a>
+            </form>
+            <div className="SideImage right"></div>
+        </div>
     );
 }
 export default Register;
