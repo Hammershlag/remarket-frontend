@@ -24,8 +24,6 @@ function Account() {
             <div className="account-info">
                 <p><strong>Username:</strong> {user?.username}</p>
                 <p><strong>Email:</strong> {user?.username}</p>
-                {/*<p><strong>First Name:</strong> {mockUserData.firstName}</p>*/}
-                {/*<p><strong>Last Name:</strong> {mockUserData.lastName}</p>*/}
                 <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
             </div>
 

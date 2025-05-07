@@ -3,6 +3,8 @@ import './Login.css';
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = process.env.API_URL;
+
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,12 +26,14 @@ function Login() {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await fetch('http://localhost:5208/api/auth/login', {
+                const response = await fetch(`http://localhost:8080/api/auth/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({
+                        usernameOrEmail: email,
+                        password: password }),
                 });
 
                 if (response.ok) {
@@ -93,3 +97,4 @@ function Login() {
 }
 
 export default Login;
+

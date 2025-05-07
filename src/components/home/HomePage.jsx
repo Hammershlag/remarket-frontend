@@ -37,7 +37,7 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://localhost:5208/api/categories');
+            const response = await fetch(`http://localhost:8080/api/categories`);
             if (response.ok) {
                 const data = await response.json();
                 setCategories(data);
@@ -48,7 +48,6 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
             console.error('Error fetching categories:', error);
         }
     };
-
 
     useEffect(() => {
         fetchCategories();
@@ -170,3 +169,4 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
 }
 
 export default HomePage;
+
