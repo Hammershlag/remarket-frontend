@@ -1,0 +1,95 @@
+.AuthPage {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.SideImage {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+    opacity: 75%;
+}
+
+.SideImage.left {
+    background-image: url('/public/images/flea-market-1.png');
+}
+
+.SideImage.right {
+    background-image: url('/public/images/flea-market-2.png');
+    transform: scaleX(-1);
+}
+
+.AuthForm {
+    display: flex;
+    flex-direction: column;
+    width: 15em;
+    margin: auto;
+    flex-basis: 400px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 1rem;
+    justify-content: flex-start;
+    min-height: 400px;
+    height: 100%;
+
+}
+
+.AuthForm h1 {
+    text-align: center;
+    margin-top: 4rem;
+    margin-bottom: 8rem;
+}
+
+.AuthForm div {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.AuthForm label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.AuthForm input {
+    height: 40px;
+    box-sizing: border-box;
+    border: 1px solid var(--brown);
+    border-radius: 4px;
+    margin-left: 1em;
+}
+
+.RegisterInput {
+    width: 250px;
+}
+
+.UsernameRegister {
+    margin-left: 20em;
+}
+
+.LoginInput {
+    width: 270px;
+}
+
+.AuthForm .error {
+    margin: 0 0 0.5em;
+    color: #8f191e;
+    font-size: 12px;
+}
+
+.AuthForm button {
+    padding: 10px;
+    width: 8em;
+    margin: 10px auto 8rem;
+    background-color: var(--brown);
+    color: var(--light);
+    border: none;
+    cursor: pointer;
+}
+
+.AuthForm button:hover {
+    background-color: var(--beige);
+}
