@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './HomePage.css';
+import '../../App.css';
 import mockData from '../../data/mockdata.json';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -76,7 +77,12 @@ function HomePage(props) {
     };
 
     const addToCart = (id) => {
-        props.setCartProductIds((prev) => [...new Set([...prev, id])]);
+        if (props.cartProductIds.includes(id)) {
+            props.showNotification('Item already in cart!');
+        } else {
+            props.setCartProductIds((prev) => [...prev, id]);
+            props.showNotification('New item added to cart');
+        }
     };
 
     const toggleWishlist = (id) => {
@@ -103,6 +109,11 @@ function HomePage(props) {
                     <i className="fas fa-search"></i>
                 </button>
             </form>
+            {props.notification && (
+                <div className="notification-bubble">
+                    {props.notification}
+                </div>
+            )}
             <div className="listings-container">
                 <div className="sidebar">
                     <form onSubmit={handleSearch}>

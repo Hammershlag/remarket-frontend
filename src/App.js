@@ -18,9 +18,15 @@ function App() {
     const { user } = useUser();
     const [cartProductIds, setCartProductIds] = useState([]);
     const [wishlistProductIds, setWishlistProductIds] = useState([]);
+    const [notification, setNotification] = useState(null);
 
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
+
+    const showNotification = (message) => {
+        setNotification(message);
+        setTimeout(() => setNotification(null), 3000); // Fades away after 3 seconds
     };
 
     return (
@@ -34,7 +40,10 @@ function App() {
                 <Routes>
                     <Route path="/" element={<HomePage wishlistProductIds={wishlistProductIds}
                                                        setWishlistProductIds={setWishlistProductIds}
-                                                       setCartProductIds={setCartProductIds} />} />
+                                                       cartProductIds={cartProductIds}
+                                                       setCartProductIds={setCartProductIds}
+                                                       showNotification={showNotification}
+                                                       notification={notification}/>} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
@@ -77,6 +86,8 @@ function App() {
 
                     <Route path="/not-authorized" element={<h2>Access Denied</h2>} />
                 </Routes>
+
+
             </div>
         </Router>
     );
