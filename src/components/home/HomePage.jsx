@@ -2,7 +2,12 @@ import React, {useCallback, useEffect, useState} from 'react';
 import './HomePage.css';
 import mockData from '../../data/mockdata.json';
 
-function HomePage({ props }) {
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
+
+function HomePage(props) {
     const [categories, setCategories] = useState([]);
     const [listings, setListings] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -74,9 +79,16 @@ function HomePage({ props }) {
         props.setCartProductIds((prev) => [...new Set([...prev, id])]);
     };
 
-    const addToWishlist = (id) => {
-        props.setWishlistProductIds((prev) => [...new Set([...prev, id])]);
+    const toggleWishlist = (id) => {
+        props.setWishlistProductIds((prev) => {
+            if (prev.includes(id)) {
+                return prev.filter(itemId => itemId !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
     };
+
 
     return (
         <div className="HomePage">
@@ -164,16 +176,24 @@ function HomePage({ props }) {
                                     <img
                                         src={listing.imageUrl}
                                         alt={listing.title}
-                                        className="product-image"
                                         onError={(e) => {
                                             e.target.onerror = null;
-                                            e.target.src = 'https://via.placeholder.com/200x200?text=Image+Not+Found';
+                                            e.target.src = 'https://via.placeholder.com/400x400?text=Image+Not+Found';
                                         }}
                                     />
                                     <h3 className="product-title">{listing.title}</h3>
                                     <p className="product-price">${listing.price}</p>
-                                    <button onClick={() => addToCart(listing.id)}>Add to Cart</button>
-                                    <button onClick={() => addToWishlist(listing.id)}>Add to Wishlist</button>
+                                    <div className="product-card-buttons-container">
+                                        <button onClick={() => addToCart(listing.id)} title="Add to Cart">
+                                            <FontAwesomeIcon icon={faCartShopping} />
+                                        </button>
+                                        <button onClick={() => toggleWishlist(listing.id)} title="Add to Wishlist">
+                                            <FontAwesomeIcon
+                                                icon={props.wishlistProductIds.includes(listing.id) ? solidHeart : regularHeart}
+                                                style={{ color: props.wishlistProductIds.includes(listing.id) ? 'red' : 'black' }}
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>

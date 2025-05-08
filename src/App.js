@@ -32,7 +32,9 @@ function App() {
                 </button>
 
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
+                    <Route path="/" element={<HomePage wishlistProductIds={wishlistProductIds}
+                                                       setWishlistProductIds={setWishlistProductIds}
+                                                       setCartProductIds={setCartProductIds} />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
