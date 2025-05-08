@@ -1,14 +1,14 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './HomePage.css';
 import mockData from '../../data/mockdata.json';
 
-function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWishlistProductIds }) {
-    const [categories, setCategories] = React.useState([]);
-    const [listings, setListings] = React.useState([]);
-    const [searchQuery, setSearchQuery] = React.useState('');
-    const [priceRange, setPriceRange] = React.useState([0, 9999]);
-    const [priceSort, setPriceSort] = React.useState('none'); // 'asc', 'desc' or 'none'
-    const [reviewSort, setReviewSort] = React.useState('none'); // 'most', 'least' or 'none'
+function HomePage({ props }) {
+    const [categories, setCategories] = useState([]);
+    const [listings, setListings] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [priceRange, setPriceRange] = useState([1, 10000]);
+    const [priceSort, setPriceSort] = useState('none');
+    const [reviewSort, setReviewSort] = useState('none');
 
     const fetchListings = useCallback(() => {
         let data = mockData;
@@ -51,55 +51,36 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+        fetchListings();
+    }, [fetchListings]);
 
     const handleSearch = (e) => {
         e.preventDefault();
-        console.log('Search query:', searchQuery);
         fetchListings();
     };
 
-    const handlePriceChange = (e, index) => {
+    const handlePriceInputChange = (e) => {
+        const [min, max] = e.target.value.split(',').map(Number);
+        setPriceRange([min, max]);
+    };
+
+    const handlePriceSliderChange = (value, index) => {
         const newRange = [...priceRange];
-        newRange[index] = parseFloat(e.target.value);
+        newRange[index] = Math.max(1, Math.min(10000, Number(value)));
         setPriceRange(newRange);
     };
 
     const addToCart = (id) => {
-        setCartProductIds((prev) => [...new Set([...prev, id])]);
+        props.setCartProductIds((prev) => [...new Set([...prev, id])]);
     };
 
     const addToWishlist = (id) => {
-        setWishlistProductIds((prev) => [...new Set([...prev, id])]);
-    };
-
-    const toggleSortOrder = (type) => {
-        if (type === 'price') {
-            setPriceSort((prevOrder) => {
-                if (prevOrder === 'none') return 'asc';
-                if (prevOrder === 'asc') return 'desc';
-                return 'none';
-            });
-        } else if (type === 'review') {
-            setReviewSort((prevOrder) => {
-                if (prevOrder === 'none') return 'most';
-                if (prevOrder === 'most') return 'least';
-                return 'none';
-            });
-        }
+        props.setWishlistProductIds((prev) => [...new Set([...prev, id])]);
     };
 
     return (
         <div className="HomePage">
             <form className="search-bar" onSubmit={handleSearch}>
-                <select className="category-dropdown">
-                    <option value=""> All </option>
-                    {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
                 <input
                     type="text"
                     placeholder="Search..."
@@ -110,59 +91,94 @@ function HomePage({ cartProductIds, setCartProductIds, wishlistProductIds, setWi
                     <i className="fas fa-search"></i>
                 </button>
             </form>
-
-            {/* Price Range and Sort Controls */}
-            <div className="filter-container">
-                <div className="price-range">
-                    <label>Price Range: </label>
-                    <input
-                        type="number"
-                        value={priceRange[0]}
-                        min="0"
-                        onChange={(e) => handlePriceChange(e, 0)}
-                    />
-                    <span> - </span>
-                    <input
-                        type="number"
-                        value={priceRange[1]}
-                        min="0"
-                        onChange={(e) => handlePriceChange(e, 1)}
-                    />
-                </div>
-                <div className="sort-by">
-                    <span>Sort by:</span>
-                    <button type="button" onClick={() => toggleSortOrder('price')}>
-                        {priceSort === 'asc' ? 'Lowest Price' : priceSort === 'desc' ? 'Highest Price' : 'No Price Sorting'}
-                    </button>
-                    <button type="button" onClick={() => toggleSortOrder('review')}>
-                        {reviewSort === 'most' ? 'Most Reviews' : reviewSort === 'least' ? 'Least Reviews' : 'No Review Sorting'}
-                    </button>
-                </div>
-            </div>
-
-            <div className="product-sections">
-                <fieldset>
-                    <legend>Listings</legend>
-                    <div className="product-listings">
-                        {listings.map((listing) => (
-                            <div key={listing.id} className="product-card">
-                                <img
-                                    src={listing.imageUrl}
-                                    alt={listing.title}
-                                    className="product-image"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://via.placeholder.com/200x200?text=Image+Not+Found';
-                                    }}
+            <div className="listings-container">
+                <div className="sidebar">
+                    <form onSubmit={handleSearch}>
+                        <select className="category-dropdown">
+                            <option value="">All Categories</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                            ))}
+                        </select>
+                        <div className="filter-container">
+                            <label>Price Range:</label>
+                            <input
+                                type="range"
+                                min="1"
+                                max="10000"
+                                step="1"
+                                value={priceRange[0]}
+                                onChange={(e) => handlePriceSliderChange(e.target.value, 0)}
+                            />
+                            <input
+                                type="range"
+                                min="1"
+                                max="10000"
+                                step="1"
+                                value={priceRange[1]}
+                                onChange={(e) => handlePriceSliderChange(e.target.value, 1)}
+                            />
+                            <div className="price-inputs">
+                                <span> $ </span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="10000"
+                                    value={priceRange[0]}
+                                    onChange={(e) => handlePriceInputChange(e.target.value)}
                                 />
-                                <h3 className="product-title">{listing.title}</h3>
-                                <p className="product-price">${listing.price}</p>
-                                <button onClick={() => addToCart(listing.id)}>Add to Cart</button>
-                                <button onClick={() => addToWishlist(listing.id)}>Add to Wishlist</button>
+                                <span> - </span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="10000"
+                                    value={priceRange[1]}
+                                    onChange={(e) => handlePriceInputChange(e.target.value)}
+                                />
                             </div>
-                        ))}
-                    </div>
-                </fieldset>
+
+                            <label>Sort by Price:</label>
+                            <select value={priceSort} onChange={(e) => setPriceSort(e.target.value)}>
+                                <option value="none">None</option>
+                                <option value="asc">Lowest Price</option>
+                                <option value="desc">Highest Price</option>
+                            </select>
+
+                            <label>Sort by Reviews:</label>
+                            <select value={reviewSort} onChange={(e) => setReviewSort(e.target.value)}>
+                                <option value="none">None</option>
+                                <option value="most">Most Reviews</option>
+                                <option value="least">Least Reviews</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <div className="vertical-separator"></div>
+
+                <div className="product-sections">
+                    <fieldset>
+                        <div className="product-listings">
+                            {listings.map((listing) => (
+                                <div key={listing.id} className="product-card">
+                                    <img
+                                        src={listing.imageUrl}
+                                        alt={listing.title}
+                                        className="product-image"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://via.placeholder.com/200x200?text=Image+Not+Found';
+                                        }}
+                                    />
+                                    <h3 className="product-title">{listing.title}</h3>
+                                    <p className="product-price">${listing.price}</p>
+                                    <button onClick={() => addToCart(listing.id)}>Add to Cart</button>
+                                    <button onClick={() => addToWishlist(listing.id)}>Add to Wishlist</button>
+                                </div>
+                            ))}
+                        </div>
+                    </fieldset>
+                </div>
             </div>
         </div>
     );
