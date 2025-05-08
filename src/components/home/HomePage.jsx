@@ -16,6 +16,10 @@ function HomePage(props) {
     const [priceSort, setPriceSort] = useState('none');
     const [reviewSort, setReviewSort] = useState('none');
 
+    const applyFilters = () => {
+        fetchListings();
+    }
+
     const fetchListings = useCallback(() => {
         let data = mockData;
 
@@ -58,7 +62,7 @@ function HomePage(props) {
     useEffect(() => {
         fetchCategories();
         fetchListings();
-    }, [fetchListings]);
+    }, []);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -175,6 +179,9 @@ function HomePage(props) {
                             </select>
                         </div>
                     </form>
+                    <button className="apply-filters-btn" onClick={applyFilters}>
+                        Apply
+                    </button>
                 </div>
 
                 <div className="vertical-separator"></div>

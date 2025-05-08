@@ -120,6 +120,22 @@
     text-align: left;
 }
 
+.apply-filters-btn {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.apply-filters-btn:hover {
+    background-color: #0056b3;
+}
+
+
 .vertical-separator {
     width: 1px;
     background-color: #ddd;
@@ -224,3 +240,4 @@
 .product-card button:hover svg {
     transform: scale(1.2);
 }
+
