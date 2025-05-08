@@ -56,7 +56,10 @@ function App() {
                                 <Wishlist
                                     productIds={wishlistProductIds}
                                     setProductIds={setWishlistProductIds}
+                                    cartProductIds={cartProductIds}
                                     setCartProductIds={setCartProductIds}
+                                    showNotification={showNotification}
+                                    notification={notification}
                                 />
                             </PrivateRoute>
                         }
