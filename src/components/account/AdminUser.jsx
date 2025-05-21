@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function AdminUserList() {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
-    const [suspendedEmails, setSuspendedEmails] = useState([]);
+    const [suspendedEmails] = useState([]);
     const { user } = useUser();
     const role = user?.role?.toLowerCase();
 
@@ -15,14 +15,14 @@ function AdminUserList() {
             console.warn("User or token not available yet.");
             return;
         }
-
+        console.log("Sending token:", user?.token);
         const fetchUsers = async () => {
             const token = user.token;
 
             try {
                 const res = await fetch('http://localhost:8080/api/admin/accounts?page=0&size=10', {
                     headers: {
-                        'Content-Type': 'application/json',
+                        //'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     }
                 });

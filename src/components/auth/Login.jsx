@@ -45,7 +45,7 @@ function Login() {
 
                     const newUser = {
                         token: data.accessToken,
-                        role: 'USER',
+                        role: 'ADMIN',
                         //role: data.userRole?.toLowerCase(),
                         username: decodedPayload.sub,
                         email: decodedPayload.email || decodedPayload.sub

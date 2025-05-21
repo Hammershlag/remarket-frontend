@@ -25,7 +25,7 @@ function App() {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
     //CHANGE THIS SHIT BECASE ITS ONLY FOR MOCKING ROLES
-    const effectiveRole = user?.role || 'STUFF';
+    const effectiveRole = user?.role || 'ADMIN';
     return (
         <Router>
             <div className={`App ${theme}`}>

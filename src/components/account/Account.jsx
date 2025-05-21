@@ -69,7 +69,7 @@ function Account() {
                     username: editedProfile.username,
                     email: editedProfile.email,
                     password: profile.password || "password",
-                    role: profile.role || "USER"
+                    role: profile.role || "ADMIN"
                 })
             });
 
@@ -85,10 +85,9 @@ function Account() {
         }
     };
 
-
     const handleSellerRequest = async () => {
         const token = user?.token;
-        console.log("Auth token:", user?.token);
+        console.log("Auth token:", token);
         if (!token) {
             console.error("No token available");
             return;
@@ -104,12 +103,11 @@ function Account() {
 
             if (res.ok) {
                 alert("You are now a seller!");
-                // Optionally reload role:
                 window.location.reload();
             } else {
                 const errorData = await res.json();
                 console.error("Failed to become seller:", errorData);
-                alert("Failed to become a seller. Reason: " + errorData?.errorMessage || "Unknown");
+                alert("Failed to become a seller. Reason: " + (errorData?.errorMessage || "Unknown"));
             }
         } catch (err) {
             console.error("Request failed:", err);
@@ -117,66 +115,67 @@ function Account() {
         }
     };
 
-
     const displayEmail = profile?.email?.value || profile?.email || user?.email;
 
     return (
         <div className="Account">
-            {user?.photoFileName && (
-                <img
-                    src={`http://localhost:5208/images/${user.photoFileName}`}
-                    alt="Profile"
-                    style={{
-                        width: "160px",
-                        height: "160px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                        marginBottom: "1rem"
-                    }}
-                />
-            )}
-
             <h1>Account Information</h1>
-            <div className="account-info">
-                <p><strong>Username:</strong> {profile?.username || user?.username}</p>
-                <p><strong>Email:</strong> {displayEmail}</p>
-                <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
-
-                {isEditing ? (
-                    <div className="edit-form">
-                        <div className="form-field">
-                            <label>Username:</label>
-                            <input
-                                type="text"
-                                value={editedProfile.username}
-                                onChange={(e) =>
-                                    setEditedProfile({ ...editedProfile, username: e.target.value })
-                                }
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <label>Email:</label>
-                            <input
-                                type="email"
-                                value={editedProfile.email}
-                                onChange={(e) =>
-                                    setEditedProfile({ ...editedProfile, email: e.target.value })
-                                }
-                            />
-                        </div>
-
-                        <div className="edit-buttons">
-                            <button onClick={handleSave}>Save</button>
-                            <button onClick={() => setIsEditing(false)}>Cancel</button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="account-button-row">
+            <div className="account-info-with-photo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <p><strong>Username:</strong> {profile?.username || user?.username}</p>
+                    <p><strong>Email:</strong> {displayEmail}</p>
+                    <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {user?.photoFileName && (
+                        <img
+                            src={`http://localhost:8080/api/photo/user`}
+                            alt="Profile"
+                            style={{
+                                width: "120px",
+                                height: "120px",
+                                borderRadius: "50%",
+                                objectFit: "cover",
+                                marginBottom: "1rem"
+                            }}
+                        />
+                    )}
+                    {!isEditing && (
                         <button onClick={handleEdit}>Edit</button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
+
+            {isEditing && (
+                <div className="edit-form">
+                    <div className="form-field">
+                        <label>Username:</label>
+                        <input
+                            type="text"
+                            value={editedProfile.username}
+                            onChange={(e) =>
+                                setEditedProfile({ ...editedProfile, username: e.target.value })
+                            }
+                        />
+                    </div>
+
+                    <div className="form-field">
+                        <label>Email:</label>
+                        <input
+                            type="email"
+                            value={editedProfile.email}
+                            onChange={(e) =>
+                                setEditedProfile({ ...editedProfile, email: e.target.value })
+                            }
+                        />
+                    </div>
+
+                    <div className="edit-buttons">
+                        <button onClick={handleSave}>Save</button>
+                        <button onClick={() => setIsEditing(false)}>Cancel</button>
+                    </div>
+                </div>
+            )}
 
             <div className="button-row">
                 <button onClick={handleLogoutClick}>Sign out</button>

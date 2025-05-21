@@ -227,3 +227,18 @@
     max-width: 400px;
     margin-top: 1rem;
 }
+
+.account-info-with-photo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.account-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
