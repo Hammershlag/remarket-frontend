@@ -58,7 +58,7 @@ function Login() {
 
                         setUser(newUser);
                         console.log('Login successful:', newUser);
-                        navigate('/home');
+                        navigate('/');
                     } else {
                         const userErrorData = await userResponse.json();
                         setErrors({ server: userErrorData.message });

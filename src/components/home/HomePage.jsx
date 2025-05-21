@@ -7,8 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
+import {useUser} from "../../contexts/UserContext";
 
 function HomePage(props) {
+    const {user} = useUser()
     const [categories, setCategories] = useState([]);
     const [listings, setListings] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,30 +22,43 @@ function HomePage(props) {
         fetchListings();
     }
 
-    const fetchListings = useCallback(() => {
-        let data = mockData;
+    const fetchListings = useCallback(async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/listings");
+            if (!response.ok) {
+                throw new Error("Failed to fetch listings");
+            }
 
-        data = data.filter(
-            (item) =>
-                item.price >= priceRange[0] &&
-                item.price <= priceRange[1] &&
-                item.title.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+            // Pobierz dane z pola `content`
+            const listingsData = (await response.json()).content;
+            console.log('Fetched listings:', listingsData);
 
-        if (priceSort === 'asc') {
-            data.sort((a, b) => a.price - b.price);
-        } else if (priceSort === 'desc') {
-            data.sort((a, b) => b.price - a.price);
+            // Fetch the first photo for each listing
+            const listingsWithPhotos = await Promise.all(
+                listingsData.map(async (listing) => {
+                    if (listing.photos && listing.photos.length > 0) {
+                        const photoId = listing.photos[0].id;
+                        try {
+                            console.log('Fetching photo for listing:', listing.id);
+                            const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`);
+                            if (photoResponse.ok) {
+                                const photoBase64 = await photoResponse.json();
+                                const photoUrl = `data:image/jpeg;base64,${photoBase64.data}`;
+                                return { ...listing, imageUrl: photoUrl };
+                            }
+                        } catch (error) {
+                            console.error(`Failed to fetch photo for listing ${listing.id}:`, error);
+                        }
+                    }
+                    // Fallback to a placeholder image if no photo is available
+                    return { ...listing, imageUrl: 'https://via.placeholder.com/400x400' };
+                })
+            );
+
+            setListings(listingsWithPhotos);
+        } catch (error) {
+            console.error("Error fetching listings:", error);
         }
-
-        if (reviewSort === 'most') {
-            data.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
-        } else if (reviewSort === 'least') {
-            data.sort((a, b) => (a.reviewCount || 0) - (b.reviewCount || 0));
-        }
-
-
-        setListings(data);
     }, [priceRange, priceSort, reviewSort, searchQuery]);
 
     const fetchCategories = async () => {
@@ -81,25 +96,57 @@ function HomePage(props) {
         setPriceRange(newRange);
     };
 
-    const addToCart = (id) => {
-        if (props.cartProductIds.includes(id)) {
-            props.showNotification('Item already in cart!');
-        } else {
-            props.setCartProductIds((prev) => [...prev, id]);
-            props.showNotification('New item added to cart');
+    const addToCart = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/shopping-cart`, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                props.setCartProductIds((prev) => [...prev, id]);
+                props.showNotification('New item added to cart');
+            } else {
+                const errorData = await response.json();
+                props.showNotification(errorData.errorMessage || 'Failed to add item to cart');
+            }
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            props.showNotification('An error occurred while adding to cart');
         }
     };
 
-    const toggleWishlist = (id) => {
-        props.setWishlistProductIds((prev) => {
-            if (prev.includes(id)) {
-                return prev.filter(itemId => itemId !== id);
-            } else {
-                return [...prev, id];
-            }
-        });
-    };
+    const toggleWishlist = async (id) => {
+        const isInWishlist = props.wishlistProductIds.includes(id);
 
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/wishlist`, {
+                method: isInWishlist ? "DELETE" : "POST",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`, // Użyj tokena użytkownika
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                props.setWishlistProductIds((prev) =>
+                    isInWishlist ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+                );
+                props.showNotification(
+                    isInWishlist ? 'Item removed from wishlist' : 'Item added to wishlist'
+                );
+            } else {
+                const errorData = await response.json();
+                props.showNotification(errorData.errorMessage || 'Failed to update wishlist');
+            }
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+            props.showNotification('An error occurred while updating wishlist');
+        }
+    };
 
     return (
         <div className="HomePage">
@@ -195,10 +242,6 @@ function HomePage(props) {
                                     <img
                                         src={listing.imageUrl}
                                         alt={listing.title}
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = 'https://via.placeholder.com/400x400?text=Image+Not+Found';
-                                        }}
                                     />
                                     <h3 className="product-title">{listing.title}</h3>
                                     <p className="product-price">${listing.price}</p>
