@@ -17,15 +17,21 @@ function Account() {
         alert("The request was sent to admin");
     };
 
+    const handleSeller = () => {
+        navigate('/seller');
+    }
+
     return (
         <div className="Account">
 
             <h1>Account Information</h1>
             <div className="account-info">
                 <p><strong>Username:</strong> {user?.username}</p>
-                <p><strong>Email:</strong> {user?.username}</p>
+                <p><strong>Email:</strong> {user?.email}</p>
                 <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
+                <p><strong>Password:</strong> {user?.password || 'N/A'}</p>
             </div>
+            <button onClick={handleSeller}>Seller</button>
 
             <div className="button-row">
                 <button onClick={handleLogoutClick}>Sign out</button>

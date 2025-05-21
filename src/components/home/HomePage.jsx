@@ -42,6 +42,7 @@ function HomePage(props) {
             data.sort((a, b) => (a.reviewCount || 0) - (b.reviewCount || 0));
         }
 
+
         setListings(data);
     }, [priceRange, priceSort, reviewSort, searchQuery]);
 
