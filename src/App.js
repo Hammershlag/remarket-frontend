@@ -24,7 +24,7 @@ function App() {
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
-    //CHANGE THIS SHIT BECASE ITS ONLY FOR MOCKING ROLES
+    /*CHANGE THIS SHIT BECASE ITS ONLY FOR MOCKING ROLES*/
     const effectiveRole = user?.role || 'ADMIN';
     return (
         <Router>
@@ -65,11 +65,10 @@ function App() {
                             </PrivateRoute>
                         }
                     />
-                    //Changed this
                     <Route
                         path="/admin/users"
                         element={
-                        //user && (user.role === 'admin' || user.role === 'stuff') ? (
+                        /*user && (user.role === 'admin' || user.role === 'stuff') ? (*/
                             user && (effectiveRole === 'ADMIN' || effectiveRole === 'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
