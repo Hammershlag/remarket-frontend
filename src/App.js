@@ -12,6 +12,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminUserList from './components/account/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
+import ListingPage from "./components/listing-page/ListingPage";
 
 function App() {
     const [theme, setTheme] = useState('light');
@@ -73,6 +74,11 @@ function App() {
                             </PrivateRoute>
                         }
                     />
+                    <Route
+                        path="/listing/:id"
+                        element={
+                            <ListingPage></ListingPage>
+                        }/>
 
                     <Route
                         path="/admin/users"

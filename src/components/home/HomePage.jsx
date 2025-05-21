@@ -8,9 +8,11 @@ import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import {useUser} from "../../contexts/UserContext";
+import {useNavigate} from "react-router-dom";
 
 function HomePage(props) {
     const {user} = useUser()
+    const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [listings, setListings] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -148,6 +150,10 @@ function HomePage(props) {
         }
     };
 
+    function handleProductClick(id) {
+        navigate(`/listing/${id}`);
+    }
+
     return (
         <div className="HomePage">
             <form className="search-bar" onSubmit={handleSearch}>
@@ -238,7 +244,7 @@ function HomePage(props) {
                     <fieldset>
                         <div className="product-listings">
                             {listings.map((listing) => (
-                                <div key={listing.id} className="product-card">
+                                <div key={listing.id} className="product-card" onClick={() => handleProductClick(listing.id)}>
                                     <img
                                         src={listing.imageUrl}
                                         alt={listing.title}
