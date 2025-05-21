@@ -12,6 +12,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminUserList from './components/account/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
+import UserDetails from './components/account/UserDetails';
+
 
 function App() {
     const [theme, setTheme] = useState('light');
@@ -22,7 +24,8 @@ function App() {
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
-
+    //CHANGE THIS SHIT BECASE ITS ONLY FOR MOCKING ROLES
+    const effectiveRole = user?.role || 'STUFF';
     return (
         <Router>
             <div className={`App ${theme}`}>
@@ -37,6 +40,9 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
                     <Route path="/seller" element={<Seller/>} />
+
+                    <Route path="/admin/users/view" element={<UserDetails />} />
+
 
                     <Route
                         path="/wishlist"
@@ -59,11 +65,12 @@ function App() {
                             </PrivateRoute>
                         }
                     />
-
+                    //Changed this
                     <Route
                         path="/admin/users"
                         element={
-                            user && (user.role === 'admin' || user.role === 'stuff') ? (
+                        //user && (user.role === 'admin' || user.role === 'stuff') ? (
+                            user && (effectiveRole === 'ADMIN' || effectiveRole === 'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
                                 </PrivateRoute>

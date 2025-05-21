@@ -3,9 +3,9 @@
     max-width: 600px;
     justify-content: left;
     text-align: left;
-    position: relative; /* ✅ important for stacking context */
+    position: relative;
     z-index: 1;
-    overflow: visible;  /* ✅ allows dropdowns to overflow */
+    overflow: visible;
 }
 
 
@@ -114,7 +114,7 @@
     position: relative;
     display: inline-block;
     margin-bottom: 20px;
-    z-index: 10; /* 🛡️ ensures it's above surrounding content */
+    z-index: 10;
 }
 
 .dropbtn {
@@ -131,7 +131,7 @@
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: var(--dark); /* or any bg that contrasts well */
+    background-color: var(--dark);
     top: 100%;
     left: 0;
     min-width: 160px;
@@ -141,7 +141,7 @@
 }
 
 .dropdown-content a {
-    color: var(--light); /* ✅ text always visible */
+    color: var(--light);
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -150,7 +150,7 @@
 
 .dropdown-content a:hover {
     background-color: var(--beige);
-    color: var(--dark); /* optional: different color on hover */
+    color: var(--dark);
 }
 
 
@@ -182,3 +182,48 @@
     background-color: #002b5c;
 }
 
+.account-info {
+    position: relative;
+    padding-bottom: 3rem;
+}
+
+.account-button-row {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-field label {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.edit-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 1rem;
+}

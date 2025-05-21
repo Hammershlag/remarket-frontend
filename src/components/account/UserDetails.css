@@ -1,0 +1,30 @@
+.UserDetails {
+    max-width: 700px;
+    margin: 3rem auto;
+    padding: 2.5rem 3rem;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.25rem;
+}
+
+.UserDetails h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #333;
+}
+
+.UserDetails p {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.UserDetails strong {
+    width: 140px;
+    color: #222;
+    font-weight: 600;
+}

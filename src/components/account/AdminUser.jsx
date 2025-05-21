@@ -1,44 +1,103 @@
 import React, { useEffect, useState } from 'react';
 import './AdminUser.css';
 import { useUser } from '../../contexts/UserContext';
-
-const mockUsers = [
-    { id: 1, username: 'john_doe', email: 'john@example.com', role: 'buyer' },
-    { id: 2, username: 'jane_admin', email: 'jane@example.com', role: 'admin' },
-    { id: 3, username: 'mark_seller', email: 'mark@example.com', role: 'seller' },
-];
+import { useNavigate } from 'react-router-dom';
 
 function AdminUserList() {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
+    const [suspendedEmails, setSuspendedEmails] = useState([]);
     const { user } = useUser();
+    const role = user?.role?.toLowerCase();
 
     useEffect(() => {
-        // TODO: Replace with real API call
-        setUsers(mockUsers);
-    }, []);
+        if (!user || !user.token) {
+            console.warn("User or token not available yet.");
+            return;
+        }
 
-    // Allow both "admin" and "stuff"
-    if (!user || (user.role !== 'admin' && user.role !== 'stuff')) {
+        const fetchUsers = async () => {
+            const token = user.token;
+
+            try {
+                const res = await fetch('http://localhost:8080/api/admin/accounts?page=0&size=10', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) throw new Error('Failed to fetch users');
+
+                const data = await res.json();
+                setUsers(data.content || []);
+            } catch (err) {
+                console.error("Error loading user list:", err);
+            }
+        };
+
+        fetchUsers();
+    }, [user]);
+
+    if (role === 'user' || role === 'seller') {
         return <p>You are not authorized to view this page.</p>;
     }
 
-    const handleView = (id) => {
-        alert(`Viewing user ${id}`);
+    const handleView = (userObj) => {
+        navigate('/admin/users/view', { state: { user: userObj } });
     };
 
-    const handleSuspend = (id) => {
-        alert(`User ${id} suspended`);
-    };
+    const handleSuspend = async (id) => {
+        if (!window.confirm("Are you sure you want to suspend this user?")) return;
 
-    const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            alert(`User ${id} deleted`);
+        try {
+            const token = user.token;
+            const res = await fetch(`http://localhost:8080/api/admin/accounts/${id}/block`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                setUsers(prev =>
+                    prev.map(u => u.id === id ? { ...u, status: 'BLOCKED' } : u)
+                );
+                alert('User suspended successfully.');
+            } else {
+                alert("Failed to suspend user.");
+            }
+        } catch (err) {
+            console.error("Error suspending user:", err);
+            alert("An error occurred.");
         }
     };
 
-    const handleFlag = (id) => {
-        alert(`User ${id} flagged for admin review.`);
+
+    const handleDelete = async (email) => {
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+        try {
+            const token = user.token;
+            const res = await fetch(`http://localhost:8080/api/accounts`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (res.status === 204) {
+                setUsers(prev => prev.filter(u => u.email !== email));
+                alert('User deleted.');
+            } else {
+                alert('Failed to delete user.');
+            }
+        } catch (err) {
+            console.error('Error deleting user:', err);
+            alert('An error occurred.');
+        }
     };
+
 
     return (
         <div className="AdminUserList">
@@ -53,26 +112,35 @@ function AdminUserList() {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map(u => (
-                    <tr key={u.id}>
-                        <td>{u.username}</td>
-                        <td>{u.email}</td>
-                        <td>{u.role}</td>
-                        <td className="action-buttons">
-                            {user.role === 'admin' ? (
-                                <>
-                                    <button onClick={() => handleView(u.id)}>View</button>
-                                    <button onClick={() => handleSuspend(u.id)}>Suspend</button>
-                                    <button onClick={() => handleDelete(u.id)}>Delete</button>
-                                </>
-                            ) : (
-                                user.role === 'stuff' && (
-                                    <button onClick={() => handleFlag(u.id)}>Flag</button>
-                                )
-                            )}
-                        </td>
-                    </tr>
-                ))}
+                {users.map(u => {
+                    const email = typeof u.email === 'string' ? u.email : u.email?.value || '';
+                    return (
+                        <tr key={email}>
+                            <td>{u.username}</td>
+                            <td>{email}</td>
+                            <td>{u.role}</td>
+                            <td className="action-buttons">
+                                {(role === 'admin' || role === 'stuff') && (
+                                    <>
+                                        <button onClick={() => handleView(u)}>View</button>
+                                        {role === 'admin' && (
+                                            <>
+                                                {suspendedEmails.includes(email) ? (
+                                                    <button style={{ backgroundColor: "red", color: "white" }} disabled>
+                                                        Suspended
+                                                    </button>
+                                                ) : (
+                                                    <button onClick={() => handleSuspend(u.id)}>Suspend</button>
+                                                )}
+                                                <button onClick={() => handleDelete(email)}>Delete</button>
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </td>
+                        </tr>
+                    );
+                })}
                 </tbody>
             </table>
         </div>
