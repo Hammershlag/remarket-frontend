@@ -1,6 +1,15 @@
 import React from 'react';
 import './Cart.css';
 import mockData from '../../data/mockdata.json';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_test_51RM7EJPMnb62woSnMZkQNAKWxsxfP76hgvFQP4BmpgxJPZ2RYIYWh4aYetfifWwtE94JTWmG7lXsM1jWHln2IHyj00MSVlgg4x'); // Your public key
+
+const handleCheckout = async () => {
+    const stripe = await stripePromise;
+    // somhow grab sessionId from 'http://localhost:8080/checkout'
+    stripe.redirectToCheckout({ sessionId: "cs_test_a1Amm2tbUVq8u5tV6Znc4myfRY2TaVEWVNRy1UCahzPckVpnZO6EXapY6n" });
+};
 
 const Cart = ({ productIds, setProductIds }) => {
     const cartItems = mockData.filter((item) => productIds.includes(item.id));
@@ -25,7 +34,7 @@ const Cart = ({ productIds, setProductIds }) => {
             </div>
             <div className="cart-footer">
                 <div className="total-price">Total: ${total}</div>
-                <button className="checkout-button">Check out</button>
+                <button className="checkout-button" onClick={handleCheckout}>Check out</button>
             </div>
         </div>
     );
