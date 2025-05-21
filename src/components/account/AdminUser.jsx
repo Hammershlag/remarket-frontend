@@ -27,7 +27,10 @@ function AdminUserList() {
                     }
                 });
 
-                if (!res.ok) throw new Error('Failed to fetch users');
+                if (!res.ok) {
+                    console.error('Failed to fetch users');
+                    return;
+                }
 
                 const data = await res.json();
                 setUsers(data.content || []);

@@ -23,7 +23,10 @@ function Account() {
                     }
                 });
 
-                if (!res.ok) throw new Error('Failed to fetch account');
+                if (!res.ok) {
+                    console.error('Failed to fetch account');
+                    return;
+                }
                 const data = await res.json();
                 setProfile(data);
             } catch (err) {
