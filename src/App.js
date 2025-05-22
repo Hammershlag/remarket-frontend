@@ -12,6 +12,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminUserList from './components/account/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
+import UserDetails from './components/account/UserDetails';
 import ListingPage from "./components/listing-page/ListingPage";
 
 function App() {
@@ -49,6 +50,9 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
                     <Route path="/seller" element={<Seller/>} />
+
+                    <Route path="/admin/users/view" element={<UserDetails />} />
+
 
                     <Route
                         path="/wishlist"
@@ -95,8 +99,6 @@ function App() {
 
                     <Route path="/not-authorized" element={<h2>Access Denied</h2>} />
                 </Routes>
-
-
             </div>
         </Router>
     );

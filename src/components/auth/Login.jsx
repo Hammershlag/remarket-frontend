@@ -37,7 +37,6 @@ function Login() {
                 if (response.ok) {
                     const data = await response.json();
 
-                    // Fetch user data using the access token
                     const userResponse = await fetch(`http://localhost:8080/api/accounts`, {
                         method: 'GET',
                         headers: {
