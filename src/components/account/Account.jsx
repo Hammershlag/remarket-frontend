@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 
 function Account() {
-    const { user, logout, login } = useUser();
+    const { user, logout, setUser } = useUser();
     const navigate = useNavigate();
 
     const [editedProfile, setEditedProfile] = useState(null);
@@ -53,7 +53,7 @@ function Account() {
                 const errorData = await res.json();
                 console.error("Update failed:", errorData);
             } else {
-                login(editedProfile);
+                setUser(editedProfile);
                 setIsEditing(false);
             }
         } catch (err) {
@@ -104,8 +104,8 @@ function Account() {
                 <p><strong>Email:</strong> {user?.email}</p>
                 <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
                 <p><strong>Password:</strong> {user?.password || 'N/A'}</p>
-                { /*<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {user?.photoFileName && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {/*{user?.photoFileName && (
                         <img
                             src={`http://localhost:8080/api/photo/user`}
                             alt="Profile"
@@ -117,11 +117,11 @@ function Account() {
                                 marginBottom: "1rem"
                             }}
                         />
-                    )}
+                    )} TODO: fix photo upload and download */}
                     {!isEditing && (
                         <button onClick={handleEdit}>Edit</button>
                     )}
-                </div> TODO: fix photo upload and download */}
+                </div>
             </div>
             <button onClick={handleSeller}>Seller</button>
 
