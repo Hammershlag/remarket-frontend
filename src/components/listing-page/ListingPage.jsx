@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
-import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from "../../contexts/UserContext";
 import "./ListingPage.css";
 
@@ -13,6 +12,13 @@ function ListingPage(props) {
     const [listing, setListing] = useState(null);
     const [photos, setPhotos] = useState([]);
     const [error, setError] = useState(null);
+
+    // Review form state
+    const [rating, setRating] = useState(5);
+    const [reviewTitle, setReviewTitle] = useState("");
+    const [reviewDescription, setReviewDescription] = useState("");
+    const [reviewError, setReviewError] = useState(null);
+    const [reviewSuccess, setReviewSuccess] = useState(null);
 
     const addToCart = async () => {
         try {
@@ -58,8 +64,57 @@ function ListingPage(props) {
         }
     };
 
+    const submitReview = async (e) => {
+        e.preventDefault();
+        setReviewError(null);
+        setReviewSuccess(null);
+
+        if (rating < 1 || rating > 5) {
+            setReviewError("Rating must be between 1 and 5");
+            return;
+        }
+        if (!reviewTitle.trim()) {
+            setReviewError("Review title is required");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/review`, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating,
+                    title: reviewTitle,
+                    description: reviewDescription,
+                }),
+            });
+
+            if (response.ok) {
+                setReviewSuccess("Review submitted successfully!");
+                setReviewTitle("");
+                setReviewDescription("");
+                setRating(5);
+
+                // Optionally refresh listing to show new review
+                const refreshedListing = await fetch(`http://localhost:8080/api/listings/${id}`);
+                if (refreshedListing.ok) {
+                    const listingData = await refreshedListing.json();
+                    setListing(listingData);
+                }
+            } else {
+                const errorData = await response.json();
+                setReviewError(errorData.errorMessage || "Failed to submit review");
+            }
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            setReviewError("An error occurred while submitting your review");
+        }
+    };
+
     useEffect(() => {
-        console.log(id);
         const fetchListing = async () => {
             try {
                 const response = await fetch(`http://localhost:8080/api/listings/${id}`);
@@ -138,9 +193,61 @@ function ListingPage(props) {
                     <FontAwesomeIcon icon={regularHeart} /> Add to Wishlist
                 </button>
             </div>
+
+            <div className="review-section">
+                <h2>Add a Review</h2>
+                {reviewError && <p className="error-message">{reviewError}</p>}
+                {reviewSuccess && <p className="success-message">{reviewSuccess}</p>}
+                <form onSubmit={submitReview}>
+                    <label>
+                        Rating (1-5):{" "}
+                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                            {[1,2,3,4,5].map(num => (
+                                <option key={num} value={num}>{num}</option>
+                            ))}
+                        </select>
+                    </label>
+                    <br />
+                    <label>
+                        Title: <br />
+                        <input
+                            type="text"
+                            value={reviewTitle}
+                            onChange={(e) => setReviewTitle(e.target.value)}
+                            required
+                        />
+                    </label>
+                    <br />
+                    <label>
+                        Description: <br />
+                        <textarea
+                            value={reviewDescription}
+                            onChange={(e) => setReviewDescription(e.target.value)}
+                            rows="4"
+                        />
+                    </label>
+                    <br />
+                    <button type="submit">Submit Review</button>
+                </form>
+
+                <h2>Reviews</h2>
+                {listing.reviews && listing.reviews.length > 0 ? (
+                    <ul className="reviews-list">
+                        {listing.reviews.map(review => (
+                            <li key={review.id} className="review-item">
+                                <p><strong>Rating:</strong> {review.rating} / 5</p>
+                                <p><strong>Title:</strong> {review.title}</p>
+                                <p><strong>Description:</strong> {review.description}</p>
+                                <p><em>By: {review.reviewerUsername}</em></p>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No reviews yet.</p>
+                )}
+            </div>
         </div>
     );
 }
 
 export default ListingPage;
-
