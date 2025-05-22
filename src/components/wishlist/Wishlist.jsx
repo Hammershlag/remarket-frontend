@@ -2,15 +2,21 @@ import React from 'react';
 import './Wishlist.css';
 import mockData from '../../data/mockdata.json';
 
-function Wishlist({ productIds, setProductIds, setCartProductIds }) {
-    const wishlistItems = mockData.filter((item) => productIds.includes(item.id));
+function Wishlist(props) {
+    const wishlistItems = mockData.filter((item) => props.productIds.includes(item.id));
 
     const handleAddToCart = (productId) => {
-        setCartProductIds((prevProducts) => [...prevProducts,productId])
+        if (!props.cartProductIds.includes(productId)) {
+            props.setCartProductIds((prevProducts) => [...prevProducts, productId]);
+            props.setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
+            props.showNotification('Item added to cart');
+        } else {
+            props.showNotification('Item already in cart!');
+        }
     };
 
     const handleRemoveFromWishlist = (productId) => {
-        setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
+        props.setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
         console.log(`Product ${productId} removed from wishlist`);
     };
 
@@ -64,6 +70,11 @@ function Wishlist({ productIds, setProductIds, setCartProductIds }) {
                 ))}
                 </tbody>
             </table>
+            {props.notification && (
+                <div className="notification-bubble">
+                    {props.notification}
+                </div>
+            )}
         </div>
     );
 }
