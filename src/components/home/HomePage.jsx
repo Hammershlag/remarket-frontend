@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './HomePage.css';
 import '../../App.css';
-import mockData from '../../data/mockdata.json';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
@@ -31,11 +30,9 @@ function HomePage(props) {
                 throw new Error("Failed to fetch listings");
             }
 
-            // Pobierz dane z pola `content`
             const listingsData = (await response.json()).content;
             console.log('Fetched listings:', listingsData);
 
-            // Fetch the first photo for each listing
             const listingsWithPhotos = await Promise.all(
                 listingsData.map(async (listing) => {
                     if (listing.photos && listing.photos.length > 0) {
@@ -52,8 +49,7 @@ function HomePage(props) {
                             console.error(`Failed to fetch photo for listing ${listing.id}:`, error);
                         }
                     }
-                    // Fallback to a placeholder image if no photo is available
-                    return { ...listing, imageUrl: 'https://via.placeholder.com/400x400' };
+                    return { ...listing, imageUrl: 'https://placehold.co/400' };
                 })
             );
 
@@ -244,10 +240,11 @@ function HomePage(props) {
                     <fieldset>
                         <div className="product-listings">
                             {listings.map((listing) => (
-                                <div key={listing.id} className="product-card" onClick={() => handleProductClick(listing.id)}>
+                                <div key={listing.id} className="product-card">
                                     <img
                                         src={listing.imageUrl}
                                         alt={listing.title}
+                                        onClick={() => handleProductClick(listing.id)}
                                     />
                                     <h3 className="product-title">{listing.title}</h3>
                                     <p className="product-price">${listing.price}</p>
