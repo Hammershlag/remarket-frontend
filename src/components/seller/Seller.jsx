@@ -178,7 +178,7 @@ function Seller() {
                                     onChange={handleImageChange}
                                 />
                             </div>
-                            <button type="submit">Create Listing</button>
+                            <button type="submit" className="seller-button">Create Listing</button>
                         </form>
                         {message && <p className="message">{message}</p>}
                     </div>
