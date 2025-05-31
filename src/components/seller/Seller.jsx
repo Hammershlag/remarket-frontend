@@ -1,70 +1,131 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './Seller.css';
-
+import { useUser } from "../../contexts/UserContext";
 
 function Seller() {
+    const {user} = useUser();
     const [productName, setProductName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
-    const [image, setImage] = useState(null);
+    const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [message, setMessage] = useState("");
-    const [products, setProducts] = useState([
-        { id: 1, name: "Sample Product 1", price: 100, description: "Description 1" },
-        { id: 2, name: "Sample Product 2", price: 200, description: "Description 2" },
-    ]);
+
+    useEffect(() => {
+        if (!user || !user.token) {
+            console.error("User is not logged in or token is missing.");
+            return;
+        }
+
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/categories", {
+                    method: "GET",
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch categories");
+                }
+
+                const data = await response.json();
+                setCategories(data);
+                console.log("Categories fetched:", data);
+
+                if (data.length > 0 && !selectedCategory) {
+                    setSelectedCategory(data[0].id);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            }
+        };
+
+        fetchCategories();
+    }, [user, selectedCategory]);
 
     const handleImageChange = (e) => {
-        setImage(e.target.files[0]);
+        setImages([...e.target.files]); // Accept multiple files
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append("name", productName);
-        formData.append("description", description);
-        formData.append("price", price);
-        formData.append("image", image);
+        setMessage("");
+
+        if (!user || !user.token) {
+            setMessage("User is not logged in.");
+            return;
+        }
+
+        let photoObjects = [];
 
         try {
-            const response = await fetch("http://localhost:5208/api/products", {
+            for (const file of images) {
+                const photoForm = new FormData();
+                photoForm.append("photo", file);
+
+                const photoRes = await fetch("http://localhost:8080/api/photo/listing", {
+                    method: "POST",
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                    },
+                    body: photoForm,
+                });
+
+                if (!photoRes.ok) throw new Error("Failed to upload a photo.");
+
+                const photoData = await photoRes.json();
+                photoObjects.push({ id: photoData, data: "", uploader: "test" });
+            }
+
+            const listingBody = {
+                title: productName,
+                price: parseFloat(price),
+                status: "ACTIVE",
+                category: { id: parseInt(selectedCategory), name: "placeholder" },
+                description: description,
+                photos: photoObjects,
+                sellerUsername: user.username, // Użyj nazwy użytkownika z kontekstu
+            };
+
+            const listingRes = await fetch("http://localhost:8080/api/listings", {
                 method: "POST",
-                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(listingBody),
             });
 
-            if (response.ok) {
-                setMessage("Product added successfully!");
+            if (listingRes.ok) {
+                setMessage("Listing created successfully!");
                 setProductName("");
                 setDescription("");
                 setPrice("");
-                setImage(null);
-                // Add the new product to the list (mocked for now)
-                const newProduct = { id: Date.now(), name: productName, price, description };
-                setProducts([...products, newProduct]);
+                setImages([]);
             } else {
-                const errorData = await response.json();
-                setMessage(`Error: ${errorData.message}`);
+                const err = await listingRes.json();
+                setMessage(`Error creating listing: ${err.message || "Unknown error"}`);
             }
         } catch (error) {
-            console.error("Error:", error);
-            setMessage("An error occurred while adding the product.");
+            console.error(error);
+            setMessage("An error occurred while creating the listing.");
         }
-    };
-
-    const handleViewArchive = () => {
-        alert("Redirecting to archive page...");
     };
 
     return (
         <div>
             <h1>Seller Dashboard</h1>
-            <h3>Put new listings on sale and monitor your existing ones</h3>
+            <h3>Put new listings on sale</h3>
             <div className="Seller">
                 <div className="Seller-columns">
                     <div className="Seller-left">
-                        <h2>Add a New Product</h2>
+                        <h2>Add a New Listing</h2>
                         <form onSubmit={handleSubmit}>
                             <div className="form-element">
-                                <label htmlFor="productName">Product Name: </label>
+                                <label htmlFor="productName">Product Name:</label>
                                 <input
                                     id="productName"
                                     type="text"
@@ -93,43 +154,33 @@ function Seller() {
                                 />
                             </div>
                             <div className="form-element">
-                                <label htmlFor="image">Product Image:</label>
+                                <label htmlFor="category">Category:</label>
+                                <select
+                                    id="category"
+                                    value={selectedCategory}
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    required
+                                >
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-element">
+                                <label htmlFor="images">Product Images:</label>
                                 <input
-                                    id="image"
+                                    id="images"
                                     type="file"
                                     accept="image/*"
+                                    multiple
                                     onChange={handleImageChange}
-                                    required
                                 />
                             </div>
-                            <button type="submit">Add Product</button>
+                            <button type="submit" className="seller-button">Create Listing</button>
                         </form>
                         {message && <p className="message">{message}</p>}
-                    </div>
-    
-                    <div className="Seller-right">
-                        <h2>Your Current Products</h2>
-                        <ul>
-                            {products.map((product) => (
-                                <li key={product.id} className="product-item">
-                                    <img
-                                        src={product.image || "placeholder.jpg"}
-                                        alt={product.name}
-                                        className="product-image"
-                                    />
-                                    <div className="product-details">
-                                        <h3>{product.name}</h3>
-                                        <p>
-                                            {product.description.length > 50
-                                                ? `${product.description.substring(0, 50)}...`
-                                                : product.description}
-                                        </p>
-                                        <p>Price: ${product.price}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                        <button onClick={handleViewArchive}>View Archive</button>
                     </div>
                 </div>
             </div>

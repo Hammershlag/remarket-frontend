@@ -48,6 +48,30 @@ button {
   cursor: pointer;
 }
 
+.notification-bubble {
+  position: fixed;
+  top: 60px;
+  right: 30px;
+  background-color: var(--beige);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: fadeOut 3s forwards;
+  z-index: 1000;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 
 
 

@@ -1,18 +1,107 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Wishlist.css';
-import mockData from '../../data/mockdata.json';
+import { useUser } from "../../contexts/UserContext";
 
-function Wishlist({ productIds, setProductIds, setCartProductIds }) {
-    const wishlistItems = mockData.filter((item) => productIds.includes(item.id));
+function Wishlist(props) {
+    const { user } = useUser();
+    const [wishlistItems, setWishlistItems] = useState([]);
 
-    const handleAddToCart = (productId) => {
-        setCartProductIds((prevProducts) => [...prevProducts,productId])
+    useEffect(() => {
+        const fetchWishlist = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/api/wishlists', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch wishlist');
+                }
+
+                const data = await response.json();
+                const listingsWithImages = await Promise.all(
+                    data.listings.map(async (listing) => {
+                        if (listing.photos && listing.photos.length > 0) {
+                            const photoId = listing.photos[0].id;
+                            try {
+                                console.log('Fetching photo for listing:', listing.id);
+                                const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`);
+                                if (photoResponse.ok) {
+                                    const photoBase64 = await photoResponse.json();
+                                    const photoUrl = `data:image/jpeg;base64,${photoBase64.data}`;
+                                    return { ...listing, imageUrl: photoUrl };
+                                }
+                            } catch (error) {
+                                console.error(`Failed to fetch photo for listing ${listing.id}:`, error);
+                            }
+                        }
+                        // Default fallback image if no photos
+                        return { ...listing, imageUrl: 'https://placehold.co/400' }; // <- you can change this
+                    })
+                );
+
+                setWishlistItems(listingsWithImages);
+            } catch (error) {
+                console.error('Error fetching wishlist:', error);
+            }
+        };
+
+        if (user?.token) {
+            fetchWishlist();
+        }
+    }, [user]);
+
+
+    const handleAddToCart = async (productId) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${productId}/shopping-cart`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add item to cart');
+            }
+
+            props.setCartProductIds((prevProducts) => [...prevProducts, productId]);
+            props.setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
+            setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+            props.showNotification('Item added to cart');
+        } catch (error) {
+            console.error('Error adding item to cart:', error);
+            props.showNotification('Failed to add item to cart');
+        }
     };
 
-    const handleRemoveFromWishlist = (productId) => {
-        setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
-        console.log(`Product ${productId} removed from wishlist`);
+    const handleRemoveFromWishlist = async (productId) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${productId}/wishlist`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove item from wishlist');
+            }
+
+            props.setProductIds((prevProducts) => prevProducts.filter((id) => id !== productId));
+            setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+            props.showNotification('Item removed from wishlist');
+        } catch (error) {
+            console.error('Error removing item from wishlist:', error);
+            props.showNotification('Failed to remove item from wishlist');
+        }
     };
+
 
     return (
         <div className="wishlist-container">
@@ -25,7 +114,6 @@ function Wishlist({ productIds, setProductIds, setCartProductIds }) {
                 <tr>
                     <th>Product Name</th>
                     <th>Unit Price</th>
-                    <th>Date Added</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -43,7 +131,6 @@ function Wishlist({ productIds, setProductIds, setCartProductIds }) {
                             </div>
                         </td>
                         <td>${product.price.toFixed(2)}</td>
-                        {/*<td>{product.status === 'ACTIVE' ? 'In stock' : 'Unavailable'}</td> */}
                         <td>
                             <div className="action-buttons">
                                 <button
