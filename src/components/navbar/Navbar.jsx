@@ -16,7 +16,11 @@ function Navbar({ theme }) {
     };
 
     const handleCartClick = () => {
-        navigate('/cart');
+        if (user) {
+            navigate('/cart');
+        } else {
+            navigate('/login');
+        }
     };
 
     const handleLogoutClick = () => {
