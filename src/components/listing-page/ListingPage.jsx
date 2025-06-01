@@ -20,6 +20,12 @@ function ListingPage(props) {
     const [reviewError, setReviewError] = useState(null);
     const [reviewSuccess, setReviewSuccess] = useState(null);
 
+    // Edit review state
+    const [editingReview, setEditingReview] = useState(null);
+    const [editRating, setEditRating] = useState(5);
+    const [editTitle, setEditTitle] = useState("");
+    const [editDescription, setEditDescription] = useState("");
+
     const addToCart = async () => {
         try {
             const response = await fetch(`http://localhost:8080/api/listings/${id}/shopping-cart`, {
@@ -98,12 +104,8 @@ function ListingPage(props) {
                 setReviewDescription("");
                 setRating(5);
 
-                // Optionally refresh listing to show new review
-                const refreshedListing = await fetch(`http://localhost:8080/api/listings/${id}`);
-                if (refreshedListing.ok) {
-                    const listingData = await refreshedListing.json();
-                    setListing(listingData);
-                }
+                // Refresh listing to show new review
+                await refreshListing();
             } else {
                 const errorData = await response.json();
                 setReviewError(errorData.errorMessage || "Failed to submit review");
@@ -112,6 +114,165 @@ function ListingPage(props) {
             console.error("Error submitting review:", error);
             setReviewError("An error occurred while submitting your review");
         }
+    };
+
+    const deleteReview = async (reviewId) => {
+        if (!window.confirm("Are you sure you want to delete this review?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}`, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setReviewSuccess("Review deleted successfully!");
+                await refreshListing();
+            } else {
+                const errorData = await response.json();
+                setReviewError(errorData.errorMessage || "Failed to delete review");
+            }
+        } catch (error) {
+            console.error("Error deleting review:", error);
+            setReviewError("An error occurred while deleting your review");
+        }
+    };
+
+    const startEditReview = (review) => {
+        setEditingReview(review.id);
+        setEditRating(review.rating);
+        setEditTitle(review.title);
+        setEditDescription(review.description);
+        setReviewError(null);
+        setReviewSuccess(null);
+    };
+
+    const cancelEditReview = () => {
+        setEditingReview(null);
+        setEditRating(5);
+        setEditTitle("");
+        setEditDescription("");
+    };
+
+    const submitEditReview = async (e, reviewId) => {
+        e.preventDefault();
+        setReviewError(null);
+        setReviewSuccess(null);
+
+        if (editRating < 1 || editRating > 5) {
+            setReviewError("Rating must be between 1 and 5");
+            return;
+        }
+        if (!editTitle.trim()) {
+            setReviewError("Review title is required");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}`, {
+                method: "PUT",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: editRating,
+                    title: editTitle,
+                    description: editDescription,
+                }),
+            });
+
+            if (response.ok) {
+                setReviewSuccess("Review updated successfully!");
+                setEditingReview(null);
+                await refreshListing();
+            } else {
+                const errorData = await response.json();
+                setReviewError(errorData.errorMessage || "Failed to update review");
+            }
+        } catch (error) {
+            console.error("Error updating review:", error);
+            setReviewError("An error occurred while updating your review");
+        }
+    };
+
+    const refreshListing = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}`);
+            if (response.ok) {
+                const listingData = await response.json();
+                setListing(listingData);
+            }
+        } catch (error) {
+            console.error("Error refreshing listing:", error);
+        }
+    };
+
+    const flagListing = async () => {
+        if (!window.confirm("Are you sure you want to flag this listing?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/flag`, {
+                method: "PUT",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Listing flagged successfully');
+            } else {
+                const errorData = await response.json();
+                alert(errorData.errorMessage || 'Failed to flag listing');
+            }
+        } catch (error) {
+            console.error("Error flagging listing:", error);
+            alert('An error occurred while flagging the listing');
+        }
+    };
+
+    const flagReview = async (reviewId) => {
+        if (!window.confirm("Are you sure you want to flag this review?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}/flag`, {
+                method: "PUT",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                alert('Review flagged successfully');
+            } else {
+                const errorData = await response.json();
+                alert(errorData.errorMessage || 'Failed to flag review');
+            }
+        } catch (error) {
+            console.error("Error flagging review:", error);
+            alert('An error occurred while flagging the review');
+        }
+    };
+
+    const isUserReview = (review) => {
+        return user && user.username === review.reviewerUsername;
+    };
+
+    const hasUserReview = () => {
+        return user && listing.reviews && listing.reviews.some(review =>
+            review.reviewerUsername === user.username
+        );
     };
 
     useEffect(() => {
@@ -168,6 +329,13 @@ function ListingPage(props) {
                 <p><span className="label">Seller:</span> {listing.sellerUsername}</p>
                 <p><span className="label">Status:</span> {listing.status}</p>
                 <p><span className="label">Average Rating:</span> {listing.averageRating === -1 ? "No reviews yet" : listing.averageRating.toFixed(1)}</p>
+                {user && (
+                    <div className="flag-listing">
+                        <button onClick={flagListing} className="flag-button" title="Flag this listing">
+                            🚩 Flag Listing
+                        </button>
+                    </div>
+                )}
             </div>
             <div className="photos-section">
                 <h2>Photos</h2>
@@ -195,50 +363,108 @@ function ListingPage(props) {
             </div>
 
             <div className="review-section">
-                <h2>Add a Review</h2>
-                {reviewError && <p className="error-message">{reviewError}</p>}
-                {reviewSuccess && <p className="success-message">{reviewSuccess}</p>}
-                <form onSubmit={submitReview}>
-                    <label>
-                        Rating (1-5):{" "}
-                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                            {[1,2,3,4,5].map(num => (
-                                <option key={num} value={num}>{num}</option>
-                            ))}
-                        </select>
-                    </label>
-                    <br />
-                    <label>
-                        Title: <br />
-                        <input
-                            type="text"
-                            value={reviewTitle}
-                            onChange={(e) => setReviewTitle(e.target.value)}
-                            required
-                        />
-                    </label>
-                    <br />
-                    <label>
-                        Description: <br />
-                        <textarea
-                            value={reviewDescription}
-                            onChange={(e) => setReviewDescription(e.target.value)}
-                            rows="4"
-                        />
-                    </label>
-                    <br />
-                    <button type="submit">Submit Review</button>
-                </form>
+                {!hasUserReview() && (
+                    <>
+                        <h2>Add a Review</h2>
+                        {reviewError && <p className="error-message">{reviewError}</p>}
+                        {reviewSuccess && <p className="success-message">{reviewSuccess}</p>}
+                        <form onSubmit={submitReview}>
+                            <label>
+                                Rating (1-5):{" "}
+                                <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                                    {[1,2,3,4,5].map(num => (
+                                        <option key={num} value={num}>{num}</option>
+                                    ))}
+                                </select>
+                            </label>
+                            <br />
+                            <label>
+                                Title: <br />
+                                <input
+                                    type="text"
+                                    value={reviewTitle}
+                                    onChange={(e) => setReviewTitle(e.target.value)}
+                                    required
+                                />
+                            </label>
+                            <br />
+                            <label>
+                                Description: <br />
+                                <textarea
+                                    value={reviewDescription}
+                                    onChange={(e) => setReviewDescription(e.target.value)}
+                                    rows="4"
+                                />
+                            </label>
+                            <br />
+                            <button type="submit">Submit Review</button>
+                        </form>
+                    </>
+                )}
 
                 <h2>Reviews</h2>
                 {listing.reviews && listing.reviews.length > 0 ? (
                     <ul className="reviews-list">
                         {listing.reviews.map(review => (
                             <li key={review.id} className="review-item">
-                                <p><strong>Rating:</strong> {review.rating} / 5</p>
-                                <p><strong>Title:</strong> {review.title}</p>
-                                <p><strong>Description:</strong> {review.description}</p>
-                                <p><em>By: {review.reviewerUsername}</em></p>
+                                {editingReview === review.id ? (
+                                    // Edit form
+                                    <form onSubmit={(e) => submitEditReview(e, review.id)}>
+                                        <label>
+                                            Rating (1-5):{" "}
+                                            <select value={editRating} onChange={(e) => setEditRating(Number(e.target.value))}>
+                                                {[1,2,3,4,5].map(num => (
+                                                    <option key={num} value={num}>{num}</option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        <br />
+                                        <label>
+                                            Title: <br />
+                                            <input
+                                                type="text"
+                                                value={editTitle}
+                                                onChange={(e) => setEditTitle(e.target.value)}
+                                                required
+                                            />
+                                        </label>
+                                        <br />
+                                        <label>
+                                            Description: <br />
+                                            <textarea
+                                                value={editDescription}
+                                                onChange={(e) => setEditDescription(e.target.value)}
+                                                rows="4"
+                                            />
+                                        </label>
+                                        <br />
+                                        <button type="submit">Update Review</button>
+                                        <button type="button" onClick={cancelEditReview}>Cancel</button>
+                                    </form>
+                                ) : (
+                                    // Display review
+                                    <>
+                                        <p><strong>Rating:</strong> {review.rating} / 5</p>
+                                        <p><strong>Title:</strong> {review.title}</p>
+                                        <p><strong>Description:</strong> {review.description}</p>
+                                        <p><em>By: {review.reviewerUsername}</em></p>
+                                        <div className="review-controls">
+                                            {isUserReview(review) && (
+                                                <div className="review-actions">
+                                                    <button onClick={() => startEditReview(review)}>Edit</button>
+                                                    <button onClick={() => deleteReview(review.id)}>Delete</button>
+                                                </div>
+                                            )}
+                                            {user && !isUserReview(review) && (
+                                                <div className="flag-review">
+                                                    <button onClick={() => flagReview(review.id)} className="flag-button" title="Flag this review">
+                                                        🚩 Flag Review
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
                             </li>
                         ))}
                     </ul>
