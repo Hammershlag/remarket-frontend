@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 
 function Account() {
-    const { user, logout, setUser } = useUser();
+    const { user, logout } = useUser();
     const navigate = useNavigate();
 
     const [profile, setProfile] = useState(null);
@@ -23,13 +23,19 @@ function Account() {
                 const res = await fetch(`http://localhost:8080/api/accounts`, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 });
-                if (!res.ok) throw new Error("Failed to fetch account");
+
+                if (!res.ok) {
+                    console.error("Failed to fetch account, status =", res.status);
+                    return;
+                }
+
                 const data = await res.json();
                 setProfile(data);
             } catch (err) {
                 console.error("Error fetching profile:", err);
             }
         };
+
 
         const fetchPhoto = async () => {
             try {
@@ -41,7 +47,8 @@ function Account() {
                     return;
                 }
                 if (!res.ok) {
-                    throw new Error("Failed to fetch photo");
+                    console.error("Failed to fetch photo, status =", res.status);
+                    return;
                 }
 
                 const payload = await res.json();

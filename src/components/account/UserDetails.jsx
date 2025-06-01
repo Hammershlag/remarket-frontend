@@ -14,9 +14,6 @@ function UserDetails() {
     const [photoUrl, setPhotoUrl] = useState(null);
 
     useEffect(() => {
-        if (!token) return;
-        if (!account?.id) return;
-
         const fetchPhoto = async () => {
             try {
                 const res = await fetch(
@@ -30,7 +27,8 @@ function UserDetails() {
                     return;
                 }
                 if (!res.ok) {
-                    throw new Error("Failed to fetch photo");
+                    console.error("Failed to fetch photo, status =", res.status);
+                    return;
                 }
 
                 const payload = await res.json();
@@ -43,6 +41,7 @@ function UserDetails() {
 
         fetchPhoto();
     }, [token, account]);
+
 
     if (!account) return <p>User data not available.</p>;
 
