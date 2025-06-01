@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { useUser } from "../../contexts/UserContext";
 import "./ListingPage.css";
@@ -12,6 +12,9 @@ function ListingPage(props) {
     const [listing, setListing] = useState(null);
     const [photos, setPhotos] = useState([]);
     const [error, setError] = useState(null);
+
+    // Photo modal state
+    const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
 
     // Review form state
     const [rating, setRating] = useState(5);
@@ -25,6 +28,39 @@ function ListingPage(props) {
     const [editRating, setEditRating] = useState(5);
     const [editTitle, setEditTitle] = useState("");
     const [editDescription, setEditDescription] = useState("");
+
+    const openPhotoModal = (index) => {
+        setSelectedPhotoIndex(index);
+    };
+
+    const closePhotoModal = () => {
+        setSelectedPhotoIndex(null);
+    };
+
+    const nextPhoto = () => {
+        setSelectedPhotoIndex((prev) =>
+            prev === photos.length - 1 ? 0 : prev + 1
+        );
+    };
+
+    const prevPhoto = () => {
+        setSelectedPhotoIndex((prev) =>
+            prev === 0 ? photos.length - 1 : prev - 1
+        );
+    };
+
+    const handleKeyPress = (e) => {
+        if (selectedPhotoIndex !== null) {
+            if (e.key === 'Escape') closePhotoModal();
+            if (e.key === 'ArrowRight') nextPhoto();
+            if (e.key === 'ArrowLeft') prevPhoto();
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+        return () => document.removeEventListener('keydown', handleKeyPress);
+    }, [selectedPhotoIndex]);
 
     const addToCart = async () => {
         try {
@@ -275,6 +311,12 @@ function ListingPage(props) {
         );
     };
 
+    const renderStars = (rating) => {
+        return [...Array(5)].map((_, i) => (
+            <span key={i} className={`star ${i < rating ? 'filled' : ''}`}>★</span>
+        ));
+    };
+
     useEffect(() => {
         const fetchListing = async () => {
             try {
@@ -312,166 +354,250 @@ function ListingPage(props) {
     }, [id]);
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return <div className="error-message">Error: {error}</div>;
     }
 
     if (!listing) {
-        return <div>Loading...</div>;
+        return <div className="loading-message">Loading...</div>;
     }
 
     return (
         <div className="listing-container">
-            <h1 className="listing-title">{listing.title}</h1>
-            <div className="listing-info">
-                <p>{listing.description}</p>
-                <p><span className="label">Price:</span> ${listing.price.toFixed(2)}</p>
-                <p><span className="label">Category:</span> {listing.category.name}</p>
-                <p><span className="label">Seller:</span> {listing.sellerUsername}</p>
-                <p><span className="label">Status:</span> {listing.status}</p>
-                <p><span className="label">Average Rating:</span> {listing.averageRating === -1 ? "No reviews yet" : listing.averageRating.toFixed(1)}</p>
-                {user && (
-                    <div className="flag-listing">
-                        <button onClick={flagListing} className="flag-button" title="Flag this listing">
-                            🚩 Flag Listing
+            <div className="listing-header">
+                <h1 className="listing-title">{listing.title}</h1>
+                <div className="listing-price">${listing.price.toFixed(2)}</div>
+            </div>
+
+            <div className="listing-content">
+                <div className="listing-main">
+                    <div className="photos-section">
+                        <div className="photo-gallery">
+                            {photos.length > 0 ? (
+                                photos.map((photo, index) => (
+                                    <div key={photo.id} className="photo-item" onClick={() => openPhotoModal(index)}>
+                                        <img
+                                            src={photo.imageUrl}
+                                            alt={`Photo ${photo.id}`}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="no-photos">
+                                    <p>No photos available</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="listing-description">
+                        <h2>Description</h2>
+                        <p>{listing.description}</p>
+                    </div>
+                </div>
+
+                <div className="listing-sidebar">
+                    <div className="listing-info-card">
+                        <div className="info-item">
+                            <span className="label">Category:</span>
+                            <span className="value">{listing.category.name}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="label">Seller:</span>
+                            <span className="value">{listing.sellerUsername}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="label">Status:</span>
+                            <span className="value status">{listing.status}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="label">Rating:</span>
+                            <span className="value rating">
+                                {listing.averageRating === -1 ? (
+                                    "No reviews yet"
+                                ) : (
+                                    <>
+                                        {renderStars(Math.round(listing.averageRating))}
+                                        <span className="rating-number">({listing.averageRating.toFixed(1)})</span>
+                                    </>
+                                )}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="listing-actions">
+                        <button onClick={addToCart} className="btn btn-primary">
+                            <FontAwesomeIcon icon={faCartShopping} />
+                            Add to Cart
+                        </button>
+                        <button onClick={toggleWishlist} className="btn btn-secondary">
+                            <FontAwesomeIcon icon={regularHeart} />
+                            Add to Wishlist
                         </button>
                     </div>
-                )}
-            </div>
-            <div className="photos-section">
-                <h2>Photos</h2>
-                <div className="photo-gallery">
-                    {photos.length > 0 ? (
-                        photos.map((photo) => (
-                            <img
-                                key={photo.id}
-                                src={photo.imageUrl}
-                                alt={`Photo ${photo.id}`}
-                            />
-                        ))
-                    ) : (
-                        <p>No photos available</p>
+
+                    {user && (
+                        <div className="flag-listing">
+                            <button onClick={flagListing} className="btn btn-flag">
+                                🚩 Flag Listing
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
-            <div className="listing-actions">
-                <button onClick={addToCart} title="Add to Cart">
-                    <FontAwesomeIcon icon={faCartShopping} /> Add to Cart
-                </button>
-                <button onClick={toggleWishlist} title="Add to Wishlist">
-                    <FontAwesomeIcon icon={regularHeart} /> Add to Wishlist
-                </button>
-            </div>
 
             <div className="review-section">
-                {!hasUserReview() && (
-                    <>
+                {!hasUserReview() && user && (
+                    <div className="add-review-section">
                         <h2>Add a Review</h2>
-                        {reviewError && <p className="error-message">{reviewError}</p>}
-                        {reviewSuccess && <p className="success-message">{reviewSuccess}</p>}
-                        <form onSubmit={submitReview}>
-                            <label>
-                                Rating (1-5):{" "}
-                                <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                        {reviewError && <div className="error-message">{reviewError}</div>}
+                        {reviewSuccess && <div className="success-message">{reviewSuccess}</div>}
+                        <form onSubmit={submitReview} className="review-form">
+                            <div className="form-group">
+                                <label>Rating:</label>
+                                <div className="star-rating">
                                     {[1,2,3,4,5].map(num => (
-                                        <option key={num} value={num}>{num}</option>
+                                        <span
+                                            key={num}
+                                            className={`star-input ${rating >= num ? 'selected' : ''}`}
+                                            onClick={() => setRating(num)}
+                                        >
+                                            ★
+                                        </span>
                                     ))}
-                                </select>
-                            </label>
-                            <br />
-                            <label>
-                                Title: <br />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Title:</label>
                                 <input
                                     type="text"
                                     value={reviewTitle}
                                     onChange={(e) => setReviewTitle(e.target.value)}
                                     required
                                 />
-                            </label>
-                            <br />
-                            <label>
-                                Description: <br />
+                            </div>
+                            <div className="form-group">
+                                <label>Description:</label>
                                 <textarea
                                     value={reviewDescription}
                                     onChange={(e) => setReviewDescription(e.target.value)}
                                     rows="4"
                                 />
-                            </label>
-                            <br />
-                            <button type="submit">Submit Review</button>
+                            </div>
+                            <button type="submit" className="btn btn-primary">Submit Review</button>
                         </form>
-                    </>
+                    </div>
                 )}
 
-                <h2>Reviews</h2>
-                {listing.reviews && listing.reviews.length > 0 ? (
-                    <ul className="reviews-list">
-                        {listing.reviews.map(review => (
-                            <li key={review.id} className="review-item">
-                                {editingReview === review.id ? (
-                                    // Edit form
-                                    <form onSubmit={(e) => submitEditReview(e, review.id)}>
-                                        <label>
-                                            Rating (1-5):{" "}
-                                            <select value={editRating} onChange={(e) => setEditRating(Number(e.target.value))}>
-                                                {[1,2,3,4,5].map(num => (
-                                                    <option key={num} value={num}>{num}</option>
-                                                ))}
-                                            </select>
-                                        </label>
-                                        <br />
-                                        <label>
-                                            Title: <br />
-                                            <input
-                                                type="text"
-                                                value={editTitle}
-                                                onChange={(e) => setEditTitle(e.target.value)}
-                                                required
-                                            />
-                                        </label>
-                                        <br />
-                                        <label>
-                                            Description: <br />
-                                            <textarea
-                                                value={editDescription}
-                                                onChange={(e) => setEditDescription(e.target.value)}
-                                                rows="4"
-                                            />
-                                        </label>
-                                        <br />
-                                        <button type="submit">Update Review</button>
-                                        <button type="button" onClick={cancelEditReview}>Cancel</button>
-                                    </form>
-                                ) : (
-                                    // Display review
-                                    <>
-                                        <p><strong>Rating:</strong> {review.rating} / 5</p>
-                                        <p><strong>Title:</strong> {review.title}</p>
-                                        <p><strong>Description:</strong> {review.description}</p>
-                                        <p><em>By: {review.reviewerUsername}</em></p>
-                                        <div className="review-controls">
-                                            {isUserReview(review) && (
-                                                <div className="review-actions">
-                                                    <button onClick={() => startEditReview(review)}>Edit</button>
-                                                    <button onClick={() => deleteReview(review.id)}>Delete</button>
+                <div className="reviews-section">
+                    <h2>Reviews</h2>
+                    {listing.reviews && listing.reviews.length > 0 ? (
+                        <div className="reviews-list">
+                            {listing.reviews.map(review => (
+                                <div key={review.id} className="review-item">
+                                    {editingReview === review.id ? (
+                                        <form onSubmit={(e) => submitEditReview(e, review.id)} className="review-form">
+                                            <div className="form-group">
+                                                <label>Rating:</label>
+                                                <div className="star-rating">
+                                                    {[1,2,3,4,5].map(num => (
+                                                        <span
+                                                            key={num}
+                                                            className={`star-input ${editRating >= num ? 'selected' : ''}`}
+                                                            onClick={() => setEditRating(num)}
+                                                        >
+                                                            ★
+                                                        </span>
+                                                    ))}
                                                 </div>
-                                            )}
-                                            {user && !isUserReview(review) && (
-                                                <div className="flag-review">
-                                                    <button onClick={() => flagReview(review.id)} className="flag-button" title="Flag this review">
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Title:</label>
+                                                <input
+                                                    type="text"
+                                                    value={editTitle}
+                                                    onChange={(e) => setEditTitle(e.target.value)}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Description:</label>
+                                                <textarea
+                                                    value={editDescription}
+                                                    onChange={(e) => setEditDescription(e.target.value)}
+                                                    rows="4"
+                                                />
+                                            </div>
+                                            <div className="form-actions">
+                                                <button type="submit" className="btn btn-primary">Update Review</button>
+                                                <button type="button" onClick={cancelEditReview} className="btn btn-secondary">Cancel</button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <>
+                                            <div className="review-header">
+                                                <div className="review-rating">
+                                                    {renderStars(review.rating)}
+                                                </div>
+                                                <div className="review-author">By: {review.reviewerUsername}</div>
+                                            </div>
+                                            <h3 className="review-title">{review.title}</h3>
+                                            <p className="review-description">{review.description}</p>
+                                            <div className="review-controls">
+                                                {isUserReview(review) && (
+                                                    <div className="review-actions">
+                                                        <button onClick={() => startEditReview(review)} className="btn btn-small">Edit</button>
+                                                        <button onClick={() => deleteReview(review.id)} className="btn btn-small btn-danger">Delete</button>
+                                                    </div>
+                                                )}
+                                                {user && !isUserReview(review) && (
+                                                    <button onClick={() => flagReview(review.id)} className="btn btn-small btn-flag">
                                                         🚩 Flag Review
                                                     </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No reviews yet.</p>
-                )}
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="no-reviews">No reviews yet.</p>
+                    )}
+                </div>
             </div>
+
+            {/* Photo Modal */}
+            {selectedPhotoIndex !== null && (
+                <div className="photo-modal" onClick={closePhotoModal}>
+                    <div className="photo-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={closePhotoModal}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </button>
+
+                        {photos.length > 1 && (
+                            <>
+                                <button className="modal-nav modal-prev" onClick={prevPhoto}>
+                                    <FontAwesomeIcon icon={faChevronLeft} />
+                                </button>
+                                <button className="modal-nav modal-next" onClick={nextPhoto}>
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </button>
+                            </>
+                        )}
+
+                        <img
+                            src={photos[selectedPhotoIndex]?.imageUrl}
+                            alt={`Photo ${selectedPhotoIndex + 1}`}
+                        />
+
+                        {photos.length > 1 && (
+                            <div className="photo-counter">
+                                {selectedPhotoIndex + 1} of {photos.length}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
