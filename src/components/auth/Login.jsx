@@ -37,32 +37,24 @@ function Login() {
                 if (response.ok) {
                     const data = await response.json();
 
-                    const userResponse = await fetch(`http://localhost:8080/api/accounts`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${data.accessToken}`,
-                        },
-                    });
+                    const base64Url = data.accessToken.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const decodedPayload = JSON.parse(atob(base64));
 
-                    if (userResponse.ok) {
-                        const userData = await userResponse.json();
+                    console.log('Decoded JWT payload:', decodedPayload);
 
-                        const newUser = {
-                            token: data.accessToken,
-                            username: userData.username,
-                            email: userData.email,
-                            role: userData.role,
-                            password: "********",
-                        };
+                    const newUser = {
+                        token: data.accessToken,
+                        role: 'ADMIN',
+                        //role: data.userRole?.toLowerCase(),
+                        username: decodedPayload.sub,
+                        email: decodedPayload.email || decodedPayload.sub
+                    };
 
-                        setUser(newUser);
-                        console.log('Login successful:', newUser);
-                        navigate('/');
-                    } else {
-                        const userErrorData = await userResponse.json();
-                        setErrors({ server: userErrorData.message });
-                        console.error('Failed to fetch user data:', userErrorData);
-                    }
+                    setUser(newUser);
+                    console.log('Login successful:', newUser);
+
+                    navigate('/account');
                 } else {
                     const errorData = await response.json();
                     setErrors({ server: errorData.message });

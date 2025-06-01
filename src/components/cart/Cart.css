@@ -1,5 +1,6 @@
 ﻿.cart-container {
-    width: 95%;
+    width: 90%;
+    max-width: 1000px;
     margin: 2rem auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9f9f9;
@@ -15,31 +16,6 @@ h2 {
     color: #333;
 }
 
-.cart-content {
-    display: flex;
-    gap: 2rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.cart-items {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.cart-summary {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-    padding: 1.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    height: fit-content;
-    width: 200px;
-    gap: 10px;
-}
-
 .cart-items {
     display: flex;
     flex-direction: column;
@@ -48,7 +24,6 @@ h2 {
 
 .cart-item {
     display: flex;
-    width: 85%;
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
@@ -85,8 +60,8 @@ h2 {
 }
 
 .item-desc {
-    color: gray;
-    font-weight: lighter;
+    color: #e3621e;
+    font-weight: bold;
     margin: 0.5rem 0;
 }
 
@@ -99,11 +74,10 @@ h2 {
 .item-meta {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: bold;
+    justify-content: space-between;
+    font-size: 0.9rem;
     color: #555;
     margin-top: 0.5rem;
-    gap: 1rem; /* Add spacing between elements if needed */
 }
 
 .quantity-control {
@@ -155,32 +129,4 @@ h2 {
 
 .checkout-button:hover {
     background-color: #005959;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 1.5rem;
-    gap: 0.5rem;
-}
-
-.page-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    background-color: #008080;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, opacity 0.3s ease;
-    opacity: 0.5;
-}
-
-.page-button:hover {
-    background-color: #005959;
-    opacity: 1;
-}
-
-.page-button.active {
-    opacity: 1;
-    font-weight: bold;
 }

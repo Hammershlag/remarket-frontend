@@ -4,11 +4,38 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 
 function Account() {
-    const { user, logout, setUser } = useUser();
+    const { user, logout } = useUser();
     const navigate = useNavigate();
 
+    const [profile, setProfile] = useState(null);
     const [editedProfile, setEditedProfile] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const token = user?.token;
+            if (!token) return;
+
+            try {
+                const res = await fetch(`http://localhost:8080/api/accounts`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error('Failed to fetch account');
+                    return;
+                }
+                const data = await res.json();
+                setProfile(data);
+            } catch (err) {
+                console.error("Error fetching profile:", err);
+            }
+        };
+
+        fetchProfile();
+    }, [user]);
 
     const handleLogoutClick = () => {
         logout();
@@ -16,14 +43,14 @@ function Account() {
     };
 
     const handleEdit = () => {
-        if (!user) {
+        if (!profile) {
             console.warn("Profile not loaded yet");
             return;
         }
 
         setEditedProfile({
-            username: user.username,
-            email: user.email
+            username: profile.username,
+            email: typeof profile.email === 'string' ? profile.email : profile.email?.value || ''
         });
         setIsEditing(true);
     };
@@ -44,8 +71,8 @@ function Account() {
                 body: JSON.stringify({
                     username: editedProfile.username,
                     email: editedProfile.email,
-                    password: user.password || "password",
-                    role: user.role || "ADMIN"
+                    password: profile.password || "password",
+                    role: profile.role || "ADMIN"
                 })
             });
 
@@ -53,7 +80,7 @@ function Account() {
                 const errorData = await res.json();
                 console.error("Update failed:", errorData);
             } else {
-                setUser(editedProfile);
+                setProfile(editedProfile);
                 setIsEditing(false);
             }
         } catch (err) {
@@ -91,21 +118,19 @@ function Account() {
         }
     };
 
-
-    const handleSeller = () => {
-        navigate('/seller');
-    }
+    const displayEmail = profile?.email?.value || profile?.email || user?.email;
 
     return (
         <div className="Account">
             <h1>Account Information</h1>
-            <div className="account-info">
-                <p><strong>Username:</strong> {user?.username}</p>
-                <p><strong>Email:</strong> {user?.email}</p>
-                <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
-                <p><strong>Password:</strong> {user?.password || 'N/A'}</p>
+            <div className="account-info-with-photo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <p><strong>Username:</strong> {profile?.username || user?.username}</p>
+                    <p><strong>Email:</strong> {displayEmail}</p>
+                    <p><strong>Role:</strong> {user?.role || 'N/A'}</p>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {/*{user?.photoFileName && (
+                    {user?.photoFileName && (
                         <img
                             src={`http://localhost:8080/api/photo/user`}
                             alt="Profile"
@@ -117,13 +142,12 @@ function Account() {
                                 marginBottom: "1rem"
                             }}
                         />
-                    )} TODO: fix photo upload and download */}
+                    )}
                     {!isEditing && (
                         <button onClick={handleEdit}>Edit</button>
                     )}
                 </div>
             </div>
-            <button onClick={handleSeller}>Seller</button>
 
             {isEditing && (
                 <div className="edit-form">
@@ -158,7 +182,7 @@ function Account() {
 
             <div className="button-row">
                 <button onClick={handleLogoutClick}>Sign out</button>
-                {user?.role === 'user' && (
+                {user?.role === 'USER' && (
                     <button className="request-seller-button" onClick={handleSellerRequest}>
                         I want to be a seller
                     </button>
