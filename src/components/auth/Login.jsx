@@ -18,6 +18,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
+
         if (!validateIdentifier(identifier)) newErrors.identifier = 'Invalid username/email format';
         if (!password) newErrors.password = 'Password is required';
         setErrors(newErrors);
@@ -26,45 +27,45 @@ function Login() {
             try {
                 const response = await fetch(`http://localhost:8080/api/auth/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        usernameOrEmail: identifier,
-                        password: password }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernameOrEmail: identifier, password }),
                 });
 
                 if (response.ok) {
                     const data = await response.json();
+                    const token = data.accessToken;
 
-                    const base64Url = data.accessToken.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const decodedPayload = JSON.parse(atob(base64));
+                    const profileRes = await fetch("http://localhost:8080/api/accounts", {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
 
-                    console.log('Decoded JWT payload:', decodedPayload);
+                    if (!profileRes.ok) {
+                        throw new Error("Failed to fetch user profile.");
+                    }
+
+                    const profile = await profileRes.json();
 
                     const newUser = {
-                        token: data.accessToken,
-                        role: 'ADMIN',
-                        //role: data.userRole?.toLowerCase(),
-                        username: decodedPayload.sub,
-                        email: decodedPayload.email || decodedPayload.sub
+                        token: token,
+                        username: profile.username,
+                        email: profile.email,
+                        role: profile.role
                     };
 
                     setUser(newUser);
-                    console.log('Login successful:', newUser);
-
-                    navigate('/account');
+                    console.log("Login successful:", newUser);
+                    navigate("/account");
                 } else {
                     const errorData = await response.json();
                     setErrors({ server: errorData.message });
-                    console.error('Login failed:', errorData);
+                    console.error("Login failed:", errorData);
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error("Error:", error);
             }
         }
     };
+
 
     return (
         <div className="AuthPage">

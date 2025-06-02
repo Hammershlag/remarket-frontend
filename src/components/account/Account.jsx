@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import './Account.css';
+import React, { useState, useEffect, useCallback } from "react";
+import "./Account.css";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 
@@ -17,15 +17,12 @@ function Account() {
             const res = await fetch(`http://localhost:8080/api/accounts`, {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
-
             if (!res.ok) {
                 console.error("Failed to fetch account, status =", res.status);
                 return;
             }
-
             const data = await res.json();
             setProfile(data);
-            console.log("Profile data:", data);
         } catch (err) {
             console.error("Error fetching profile:", err);
         }
@@ -36,15 +33,13 @@ function Account() {
             const res = await fetch(`http://localhost:8080/api/photo/user`, {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
-
-            if (res.status === 400) {
+            if (res.status === 400 || res.status === 404) {
                 return;
             }
             if (!res.ok) {
                 console.error("Failed to fetch photo, status =", res.status);
                 return;
             }
-
             const payload = await res.json();
             const dataUrl = `data:image/jpeg;base64,${payload.data}`;
             setPhotoUrl(dataUrl);
@@ -57,25 +52,19 @@ function Account() {
         if (!user?.token) {
             return;
         }
-
         fetchProfile();
         fetchPhoto();
     }, [fetchProfile, fetchPhoto, user?.token]);
 
     const handleLogoutClick = () => {
         logout();
-        navigate('/');
+        navigate("/");
     };
 
     const handleEdit = () => {
-        if (!user) {
-            console.warn("Profile not loaded yet");
-            return;
-        }
-
         setEditedProfile({
             username: profile.username,
-            email: profile.email
+            email: profile.email,
         });
         setIsEditing(true);
     };
@@ -85,22 +74,20 @@ function Account() {
             console.error("User token is missing. Cannot proceed!");
             return;
         }
-        if(!editedProfile) return;
-
+        if (!editedProfile) return;
         try {
             const res = await fetch(`http://localhost:8080/api/accounts`, {
-                method: 'PUT',
+                method: "PUT",
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${user.token}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${user.token}`,
                 },
                 body: JSON.stringify({
                     ...(editedProfile.username?.trim() && { username: editedProfile.username }),
                     ...(editedProfile.email?.trim() && { email: editedProfile.email }),
                     ...(editedProfile.password?.trim() && { password: editedProfile.password }),
-                })
+                }),
             });
-
             if (!res.ok) {
                 const errorData = await res.json();
                 console.error("Update failed:", errorData);
@@ -110,24 +97,20 @@ function Account() {
                 setIsEditing(false);
             }
         } catch (err) {
-            console.error('Request error:', err);
+            console.error("Request error:", err);
         }
     };
 
     const handlePhotoUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         if (!user?.token) {
             alert("You are not authenticated. Please log in again.");
             return;
         }
-
         const formData = new FormData();
         formData.append("photo", file);
-
         const method = photoUrl ? "PUT" : "POST";
-
         try {
             const uploadRes = await fetch("http://localhost:8080/api/photo/user", {
                 method,
@@ -136,13 +119,6 @@ function Account() {
                 },
                 body: formData,
             });
-
-            console.log(
-                `${method} /api/photo/user returned status ${uploadRes.status} ${
-                    uploadRes.ok ? "(OK)" : "(Not OK)"
-                }`
-            );
-
             if (!uploadRes.ok) {
                 const errJson = await uploadRes.json().catch(() => null);
                 console.error("Upload failed:", uploadRes.status, errJson);
@@ -153,40 +129,31 @@ function Account() {
                 }
                 return;
             }
-
             const payload = await uploadRes.json();
-            console.log("Upload succeeded; server returned payload:", payload);
-
             const newDataUrl = `data:image/jpeg;base64,${payload.data}`;
             setPhotoUrl(newDataUrl);
         } catch (err) {
             console.error("Error when calling", method, "/api/photo/user:", err);
             alert("Upload error. Check console for details.");
         }
-
     };
-
 
     const handleSellerRequest = async () => {
         const token = user?.token;
-        console.log("Auth token:", token);
         if (!token) {
             console.error("No token available");
             return;
         }
-
         try {
             const res = await fetch("http://localhost:8080/api/accounts/become-seller", {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
-
             if (res.ok) {
                 alert("You are now a seller!");
-                // Instead of reloading, update the profile state
-                const updatedProfile = { ...profile, role: "seller" };
+                const updatedProfile = { ...profile, role: "SELLER" };
                 setProfile(updatedProfile);
             } else {
                 const errorData = await res.json();
@@ -199,9 +166,32 @@ function Account() {
         }
     };
 
+    const handleStaffUserList = () => {
+        navigate("/stuff/statistics/users");
+    };
 
-    const handleSeller = () => {
-        navigate('/seller');
+    const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            return;
+        }
+        try {
+            const res = await fetch(`http://localhost:8080/api/accounts`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${user.token}` },
+            });
+            if (!res.ok) {
+                console.error("Failed to delete account, status =", res.status);
+                return;
+            }
+            logout();
+            navigate("/");
+        } catch (err) {
+            console.error("Error deleting account:", err);
+        }
+    };
+
+    if (!profile) {
+        return <div>Loading your profile…</div>;
     }
 
     return (
@@ -210,35 +200,32 @@ function Account() {
             <div className="account-info">
                 <div className="account-info-with-photo">
                     <div className="account-text-info">
-                        <p><strong>Username:</strong>{profile?.username}</p>
-                        <p><strong>Email:</strong>{profile?.email}</p>
-                        <p><strong>Password:</strong> {profile?.password || 'N/A'}</p>
-                        <p><strong>Role:</strong> {profile?.role || "N/A"}</p>
+                        <p>
+                            <strong>Username:</strong> {profile.username}
+                        </p>
+                        <p>
+                            <strong>Email:</strong> {profile.email}
+                        </p>
+                        <p>
+                            <strong>Role:</strong> {profile.role || "N/A"}
+                        </p>
                     </div>
 
-                    <div className="account-photo-upload">
-                        {photoUrl && (
-                            <img
-                                className="account-photo"
-                                src={photoUrl}
-                                alt="Profile"
-                                style={{
-                                    width: "120px",
-                                    height: "120px",
-                                    borderRadius: "50%",
-                                    objectFit: "cover",
-                                    marginBottom: "1rem",
-                                }}
-                            />
-                        )}
-                    </div>
+                    {photoUrl && (
+                        <div className="account-photo-upload">
+                            <img className="account-photo" src={photoUrl} alt="Profile" />
+                        </div>
+                    )}
                 </div>
+
                 {!isEditing && (
-                    <button onClick={handleEdit}>Edit</button>
+                    <button style={{ marginTop: "1rem" }} onClick={handleEdit}>
+                        Edit
+                    </button>
                 )}
             </div>
 
-            {isEditing ? (
+            {isEditing && (
                 <div className="edit-form">
                     <div className="form-field">
                         <label>Username:</label>
@@ -253,7 +240,6 @@ function Account() {
                             }
                         />
                     </div>
-
                     <div className="form-field">
                         <label>Email:</label>
                         <input
@@ -267,7 +253,6 @@ function Account() {
                             }
                         />
                     </div>
-
                     <div className="form-field">
                         <label>New Password:</label>
                         <input
@@ -282,7 +267,6 @@ function Account() {
                             placeholder="Enter new password"
                         />
                     </div>
-
                     <div className="form-field form-field--horizontal">
                         <label className="photo-label">Profile Photo:</label>
                         <label className="upload-button">
@@ -295,29 +279,25 @@ function Account() {
                             />
                         </label>
                     </div>
-
                     <div className="edit-buttons">
                         <button onClick={handleSave}>Save</button>
                         <button onClick={() => setIsEditing(false)}>Cancel</button>
                     </div>
                 </div>
-            ) : (
-                <button onClick={handleSeller}>Seller</button>
             )}
+
             <div className="button-row">
                 <button onClick={handleLogoutClick}>Sign out</button>
-                {profile?.role === "user" && (
-                    <button
-                        className="request-seller-button"
-                        onClick={handleSellerRequest}
-                    >
-                        I want to be a seller
+                {profile.role === "USER" && (
+                    <button className="request-seller-button" onClick={handleSellerRequest}>
+                        Request to be a Seller
                     </button>
                 )}
+
+                <button onClick={handleDelete}>Delete Account</button>
             </div>
         </div>
     );
 }
 
 export default Account;
-

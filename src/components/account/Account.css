@@ -1,4 +1,5 @@
-﻿.Account {
+﻿
+.Account {
     margin: 50px;
     max-width: 600px;
     justify-content: left;
@@ -7,7 +8,6 @@
     z-index: 1;
     overflow: visible;
 }
-
 
 .account-info {
     background-color: #f9f9f9;
@@ -53,6 +53,7 @@
 .admin-buttons button:hover {
     background-color: var(--brown);
 }
+
 .row-with-button {
     display: flex;
     align-items: center;
@@ -127,7 +128,6 @@
     border-radius: 5px;
 }
 
-
 .dropdown-content {
     display: none;
     position: absolute;
@@ -153,18 +153,8 @@
     color: var(--dark);
 }
 
-
 .dropdown:hover .dropdown-content {
     display: block;
-}
-
-
-.button-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    gap: 16px;
-    max-width: 500px;
 }
 
 .request-seller-button {
@@ -220,77 +210,6 @@
     font-size: 1rem;
 }
 
-.edit-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 400px;
-    margin-top: 1rem;
-}
-
-/* Latest changes */
-.account-info {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 2rem;
-    width: 600px;
-    position: relative;
-}
-
-
-.account-info-with-photo {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-}
-
-.account-text-info {
-    flex: 1;
-}
-
-.account-photo-upload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.account-photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.account-photo-upload input[type="file"] {
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.hidden-file-input {
-    display: none;
-}
-
-.upload-button {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: var(--brown);
-    color: white;
-    font-size: 1rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    text-align: center;
-    user-select: none;
-}
-.upload-button:hover {
-    background-color: var(--beige);
-}
-
 .form-field.form-field--horizontal {
     display: flex;
     align-items: center;
@@ -316,6 +235,36 @@
     cursor: pointer;
     user-select: none;
 }
+
 .upload-button:hover {
     background-color: #483a2b;
 }
+
+.button-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.button-row button {
+    white-space: nowrap;
+    width: auto;
+}
+
+.account-info-with-photo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.account-photo-upload {
+}
+.account-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
