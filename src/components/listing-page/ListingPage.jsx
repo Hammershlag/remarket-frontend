@@ -60,7 +60,7 @@ function ListingPage(props) {
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress);
         return () => document.removeEventListener('keydown', handleKeyPress);
-    }, [selectedPhotoIndex]);
+    }, [handleKeyPress]);
 
     const addToCart = async () => {
         try {
@@ -377,7 +377,7 @@ function ListingPage(props) {
                                     <div key={photo.id} className="photo-item" onClick={() => openPhotoModal(index)}>
                                         <img
                                             src={photo.imageUrl}
-                                            alt={`Photo ${photo.id}`}
+                                            alt={`Photo ${index + 1}`}
                                         />
                                     </div>
                                 ))

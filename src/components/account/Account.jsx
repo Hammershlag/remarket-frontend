@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Account.css';
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
