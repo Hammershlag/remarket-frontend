@@ -307,7 +307,7 @@ function OrderDetails() {
                                             <div className="listing-price">
                                                 {listing.price} PLN
                                             </div>
-                                            {listing.averageRating && (
+                                            {listing.averageRating && listing.averageRating > 1 && (
                                                 <div className="listing-rating">
                                                     ⭐ {listing.averageRating.toFixed(1)}
                                                 </div>
