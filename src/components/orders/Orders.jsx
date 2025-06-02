@@ -134,7 +134,8 @@ function Orders() {
                                 display: 'grid',
                                 gridTemplateColumns: '1fr 1fr',
                                 gap: '20px',
-                                marginBottom: '16px'
+                                marginBottom: '16px',
+                                minHeight: '0'
                             }}>
                                 <div className="shipping-info">
                                     <h4>Shipping Address</h4>
