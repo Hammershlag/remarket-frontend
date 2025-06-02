@@ -211,6 +211,66 @@ function OrderDetails() {
                 </div>
             </div>
 
+            {/* Sidebar */}
+            <div className="order-sidebar">
+                {/* Order Summary */}
+                <div className="summary-card">
+                    <h3>💰 Order Summary</h3>
+                    <div className="summary-content">
+                        <div className="summary-row">
+                            <span>Subtotal:</span>
+                            <span>{order.payment.total} {order.payment.currency}</span>
+                        </div>
+                        <div className="summary-row">
+                            <span>Shipping:</span>
+                            <span>Free</span>
+                        </div>
+                        <div className="summary-row">
+                            <strong>Total:</strong>
+                            <span>{order.payment.total} {order.payment.currency}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment Information */}
+                <div className="summary-card">
+                    <h3>💳 Payment Details</h3>
+                    <div className="summary-content">
+                        <div className="payment-status">
+                            <span>Status:</span>
+                            <span className={`payment-status-badge ${getPaymentStatusColor(order.payment.paymentStatus)}`}>
+                                    {order.payment.paymentStatus}
+                                </span>
+                        </div>
+                        <div className="summary-row">
+                            <span>Method:</span>
+                            <span>{order.payment.paymentMethod.replace('_', ' ')}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Shipping Information */}
+                <div className="summary-card">
+                    <h3>🚚 Shipping Details</h3>
+                    <div className="summary-content">
+                        <div className="address-block">
+                            <div className="address-line">{order.address.street}</div>
+                            <div className="address-line">{order.address.city}, {order.address.state}</div>
+                            <div className="address-line">{order.address.zipCode}</div>
+                            <div className="address-line">{order.address.country}</div>
+                        </div>
+                        <div className="summary-row">
+                            <span>Method:</span>
+                            <span>{order.shippingMethod}</span>
+                        </div>
+                        <div className="summary-row">
+                            <span>Shipped:</span>
+                            <span>{formatDate(order.shippedDate)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Main Content */}
             <div className="order-content">
                 {/* Items Section */}
@@ -257,66 +317,6 @@ function OrderDetails() {
                                 </div>
                             ))
                         )}
-                    </div>
-                </div>
-
-                {/* Sidebar */}
-                <div className="order-sidebar">
-                    {/* Order Summary */}
-                    <div className="summary-card">
-                        <h3>💰 Order Summary</h3>
-                        <div className="summary-content">
-                            <div className="summary-row">
-                                <span>Subtotal:</span>
-                                <span>{order.payment.total} {order.payment.currency}</span>
-                            </div>
-                            <div className="summary-row">
-                                <span>Shipping:</span>
-                                <span>Free</span>
-                            </div>
-                            <div className="summary-row">
-                                <strong>Total:</strong>
-                                <span>{order.payment.total} {order.payment.currency}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Payment Information */}
-                    <div className="summary-card">
-                        <h3>💳 Payment Details</h3>
-                        <div className="summary-content">
-                            <div className="payment-status">
-                                <span>Status:</span>
-                                <span className={`payment-status-badge ${getPaymentStatusColor(order.payment.paymentStatus)}`}>
-                                    {order.payment.paymentStatus}
-                                </span>
-                            </div>
-                            <div className="summary-row">
-                                <span>Method:</span>
-                                <span>{order.payment.paymentMethod.replace('_', ' ')}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Shipping Information */}
-                    <div className="summary-card">
-                        <h3>🚚 Shipping Details</h3>
-                        <div className="summary-content">
-                            <div className="address-block">
-                                <div className="address-line">{order.address.street}</div>
-                                <div className="address-line">{order.address.city}, {order.address.state}</div>
-                                <div className="address-line">{order.address.zipCode}</div>
-                                <div className="address-line">{order.address.country}</div>
-                            </div>
-                            <div className="summary-row">
-                                <span>Method:</span>
-                                <span>{order.shippingMethod}</span>
-                            </div>
-                            <div className="summary-row">
-                                <span>Shipped:</span>
-                                <span>{formatDate(order.shippedDate)}</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
