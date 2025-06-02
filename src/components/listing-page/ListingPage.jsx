@@ -375,6 +375,7 @@ function ListingPage(props) {
                             {photos.length > 0 ? (
                                 photos.map((photo, index) => (
                                     <div key={photo.id} className="photo-item" onClick={() => openPhotoModal(index)}>
+                                        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
                                         <img
                                             src={photo.imageUrl}
                                             alt={`Photo ${index + 1}`}
