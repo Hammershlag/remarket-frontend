@@ -14,6 +14,8 @@ import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
 import UserDetails from './components/account/UserDetails';
 import ListingPage from "./components/listing-page/ListingPage";
+import Orders from "./components/orders/Orders";
+import OrderDetails from "./components/orders/OrderDetails";
 
 function App() {
     const [theme, setTheme] = useState('light');
@@ -78,12 +80,15 @@ function App() {
                             </PrivateRoute>
                         }
                     />
+                    <Route path="/order-details" element={<OrderDetails />} />
                     <Route
                         path="/listing/:id"
                         element={
                             <ListingPage></ListingPage>
                         }/>
-
+                    <Route path="/orders" element={
+                        <Orders/>
+                    }/>
                     <Route
                         path="/admin/users"
                         element={
