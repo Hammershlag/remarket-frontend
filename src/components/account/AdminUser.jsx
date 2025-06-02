@@ -1,35 +1,36 @@
-
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../contexts/UserContext";
-import "./AdminUser.css";
+import React, { useEffect, useState } from 'react';
+import './AdminUser.css';
+import { useUser } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function AdminUserList() {
-    const { user } = useUser();
-    const token = user?.token;
     const navigate = useNavigate();
-
     const [users, setUsers] = useState([]);
+    const { user } = useUser();
+    const token = user.token;
+    const role = user?.role;
 
     useEffect(() => {
-        if (!token) return;
+        if (!user || !token) {
+            console.warn("User or token not available yet.");
+            return;
+        }
 
         const fetchUsers = async () => {
+
             try {
-                const res = await fetch(
-                    `http://localhost:8080/api/admin/accounts?page=0&size=100`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                const res = await fetch('http://localhost:8080/api/admin/accounts?page=0&size=10', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
-                );
+                });
+
                 if (!res.ok) {
-                    console.error("Failed to fetch user list:", res.status);
+                    console.error('Failed to fetch users: ', res.status);
                     return;
                 }
+
                 const data = await res.json();
-                console.log("DEBUG: raw data from /api/admin/accounts:", data);
                 setUsers(data.content || []);
             } catch (err) {
                 console.error("Error loading user list:", err);
@@ -37,46 +38,43 @@ function AdminUserList() {
         };
 
         fetchUsers();
-    }, [token]);
+    }, [token, user]);
 
-    const role = user?.role?.toLowerCase();
-    if (role === "user" || role === "seller") {
+    if (role === 'USER' || role === 'SELLER') {
         return <p>You are not authorized to view this page.</p>;
     }
 
     const handleView = (userObj) => {
-        navigate("/admin/users/view", { state: { user: userObj } });
+        navigate('/admin/users/view', { state: { user: userObj } });
     };
 
-    const handleSuspend = async (userId) => {
+    const handleSuspend = async (id) => {
         if (!window.confirm("Are you sure you want to suspend this user?")) return;
 
         try {
-            const res = await fetch(
-                `http://localhost:8080/api/admin/accounts/${userId}/block`,
-                {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+            const token = user.token;
+            const res = await fetch(`http://localhost:8080/api/admin/accounts/${id}/block`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            );
-            if (!res.ok) {
-                console.error("Failed to suspend user, status:", res.status);
-                alert("Failed to suspend user.");
-                return;
+            });
+
+            if (res.ok) {
+                setUsers(prev =>
+                    prev.map(u =>
+                        u.id === id
+                            ? { ...u, status: u.status === 'DISABLED' ? 'ACTIVE' : 'DISABLED' }
+                            : u
+                    )
+                );
+                alert(`User ${users.find(u => u.id === id).status === 'DISABLED' ? 'unsuspended' : 'suspended'} successfully.`);
+            } else {
+                alert("Failed to update user status.");
             }
-
-            alert("User suspended successfully.");
-
-            setUsers((prev) =>
-                prev.map((u) =>
-                    u.id === userId ? { ...u, status: "BLOCKED" } : u
-                )
-            );
         } catch (err) {
             console.error("Error suspending user:", err);
-            alert("An unexpected error occurred.");
+            alert("An error occurred.");
         }
     };
 
@@ -94,25 +92,26 @@ function AdminUserList() {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map((u) => {
-                    const email =
-                        typeof u.email === "string" ? u.email : u.email?.value || "";
-
+                {users.map(u => {
                     return (
-                        <tr key={u.id}>
+                        <tr key={u.email}>
                             <td>{u.username}</td>
-                            <td>{email}</td>
+                            <td>{u.email}</td>
                             <td>{u.role}</td>
                             <td>{u.status}</td>
                             <td className="action-buttons">
-                                {(role === "admin" || role === "stuff") && (
+                                {(role === 'ADMIN' || role === 'STUFF') && (
                                     <>
                                         <button onClick={() => handleView(u)}>View</button>
-                                        {role === "admin" && (
+                                        {role === 'ADMIN' && (
                                             <>
-                                                <button onClick={() => handleSuspend(u.id)}>
-                                                    Suspend
-                                                </button>
+                                                {u.status === 'DISABLED' ? (
+                                                    <button style={{ backgroundColor: "#a71e2a", color: "white" }} onClick={() => handleSuspend(u.id)}>
+                                                        Unsuspend
+                                                    </button>
+                                                ) : (
+                                                    <button onClick={() => handleSuspend(u.id)}>Suspend</button>
+                                                )}
                                             </>
                                         )}
                                     </>

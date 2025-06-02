@@ -228,6 +228,7 @@
     margin-top: 1rem;
 }
 
+/* Latest changes */
 .account-info {
     background-color: #fff;
     border-radius: 8px;
@@ -318,5 +319,3 @@
 .upload-button:hover {
     background-color: #483a2b;
 }
-
-

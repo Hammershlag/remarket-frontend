@@ -1,8 +1,7 @@
-
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useUser } from "../../contexts/UserContext";
-import "./UserDetails.css";
+import React, {useEffect, useState} from 'react';
+import { useLocation } from 'react-router-dom';
+import './UserDetails.css';
+import {useUser} from "../../contexts/UserContext";
 
 function UserDetails() {
     const location = useLocation();
@@ -42,13 +41,11 @@ function UserDetails() {
         fetchPhoto();
     }, [token, account]);
 
-
     if (!account) return <p>User data not available.</p>;
 
     return (
         <div className="UserDetails">
             <h2>User Details</h2>
-
             <div className="account-photo-upload">
                 {photoUrl && (
                     <img
@@ -65,21 +62,11 @@ function UserDetails() {
                     />
                 )}
             </div>
-
-            <p>
-                <strong>Username:</strong> {account.username}
-            </p>
-            <p>
-                <strong>Email:</strong>{" "}
-                {account.email?.value || account.email || "N/A"}
-            </p>
-            <p>
-                <strong>Role:</strong> {account.role}
-            </p>
+            <p><strong>Username:</strong> {account.username}</p>
+            <p><strong>Email:</strong> {account.email || "N/A"}</p>
+            <p><strong>Role:</strong> {account.role}</p>
             {account.status && (
-                <p>
-                    <strong>Status:</strong> {account.status}
-                </p>
+                <p><strong>Status:</strong> {account.status}</p>
             )}
         </div>
     );

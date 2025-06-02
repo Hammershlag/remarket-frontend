@@ -16,7 +16,11 @@ function Navbar({ theme }) {
     };
 
     const handleCartClick = () => {
-        navigate('/cart');
+        if (user) {
+            navigate('/cart');
+        } else {
+            navigate('/login');
+        }
     };
 
     const handleLogoutClick = () => {
@@ -57,9 +61,14 @@ function Navbar({ theme }) {
 
 
                 {user && (
-                    <li>
-                        <button className="nav-button" onClick={handleLogoutClick}>Sign out</button>
-                    </li>
+                    <>
+                        <li>
+                            <button className="nav-button" onClick={() => navigate('/orders')}>Orders</button>
+                        </li>
+                        <li>
+                            <button className="nav-button" onClick={handleLogoutClick}>Sign out</button>
+                        </li>
+                    </>
                 )}
             </ul>
         </nav>

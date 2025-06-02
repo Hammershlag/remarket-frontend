@@ -13,19 +13,26 @@ import AdminUserList from './components/account/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
 import UserDetails from './components/account/UserDetails';
-
+import ListingPage from "./components/listing-page/ListingPage";
+import Orders from "./components/orders/Orders";
+import OrderDetails from "./components/orders/OrderDetails";
 
 function App() {
     const [theme, setTheme] = useState('light');
     const { user } = useUser();
     const [cartProductIds, setCartProductIds] = useState([]);
     const [wishlistProductIds, setWishlistProductIds] = useState([]);
+    const [notification, setNotification] = useState(null);
 
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
-    /*CHANGE THIS SHIT BECASE ITS ONLY FOR MOCKING ROLES*/
-    const effectiveRole = user?.role || 'ADMIN';
+
+    const showNotification = (message) => {
+        setNotification(message);
+        setTimeout(() => setNotification(null), 3000); // Fades away after 3 seconds
+    };
+
     return (
         <Router>
             <div className={`App ${theme}`}>
@@ -35,7 +42,12 @@ function App() {
                 </button>
 
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
+                    <Route path="/" element={<HomePage wishlistProductIds={wishlistProductIds}
+                                                       setWishlistProductIds={setWishlistProductIds}
+                                                       cartProductIds={cartProductIds}
+                                                       setCartProductIds={setCartProductIds}
+                                                       showNotification={showNotification}
+                                                       notification={notification}/>} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
@@ -51,7 +63,10 @@ function App() {
                                 <Wishlist
                                     productIds={wishlistProductIds}
                                     setProductIds={setWishlistProductIds}
+                                    cartProductIds={cartProductIds}
                                     setCartProductIds={setCartProductIds}
+                                    showNotification={showNotification}
+                                    notification={notification}
                                 />
                             </PrivateRoute>
                         }
@@ -65,11 +80,19 @@ function App() {
                             </PrivateRoute>
                         }
                     />
+                    <Route path="/order-details" element={<OrderDetails />} />
+                    <Route
+                        path="/listing/:id"
+                        element={
+                            <ListingPage></ListingPage>
+                        }/>
+                    <Route path="/orders" element={
+                        <Orders/>
+                    }/>
                     <Route
                         path="/admin/users"
                         element={
-                        /*user && (user.role === 'admin' || user.role === 'stuff') ? (*/
-                            user && (effectiveRole === 'ADMIN' || effectiveRole === 'STUFF') ? (
+                            user && (user.role === 'ADMIN' || user.role === 'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
                                 </PrivateRoute>
