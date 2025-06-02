@@ -166,9 +166,7 @@ function Account() {
         }
     };
 
-    const handleStaffUserList = () => {
-        navigate("/stuff/statistics/users");
-    };
+
 
     const handleDelete = async () => {
         if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {

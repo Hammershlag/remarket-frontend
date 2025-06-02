@@ -40,8 +40,11 @@ function Login() {
                     });
 
                     if (!profileRes.ok) {
-                        throw new Error("Failed to fetch user profile.");
+                        setErrors({ server: "Failed to fetch user profile." });
+                        console.error("Failed to fetch user profile.");
+                        return;
                     }
+
 
                     const profile = await profileRes.json();
 
