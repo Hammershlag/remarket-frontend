@@ -228,17 +228,94 @@
     margin-top: 1rem;
 }
 
+/* Latest changes */
+.account-info {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    width: 600px;
+    position: relative;
+}
+
+
 .account-info-with-photo {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.account-text-info {
+    flex: 1;
+}
+
+.account-photo-upload {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
 }
 
 .account-photo {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.account-photo-upload input[type="file"] {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--brown);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+}
+.upload-button:hover {
+    background-color: var(--beige);
+}
+
+.form-field.form-field--horizontal {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.photo-label {
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #5a4d3f;
+    color: #fff;
+    font-size: 0.9rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    user-select: none;
+}
+.upload-button:hover {
+    background-color: #483a2b;
 }

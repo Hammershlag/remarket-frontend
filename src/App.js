@@ -87,7 +87,7 @@ function App() {
                     <Route
                         path="/admin/users"
                         element={
-                            user && (user.role === 'admin' || user.role === 'stuff') ? (
+                            user && (user.role === 'ADMIN' || user.role === 'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
                                 </PrivateRoute>
