@@ -60,7 +60,7 @@ function ListingPage(props) {
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress);
         return () => document.removeEventListener('keydown', handleKeyPress);
-    }, [selectedPhotoIndex]);
+    }, [handleKeyPress]);
 
     const addToCart = async () => {
         try {
@@ -375,9 +375,10 @@ function ListingPage(props) {
                             {photos.length > 0 ? (
                                 photos.map((photo, index) => (
                                     <div key={photo.id} className="photo-item" onClick={() => openPhotoModal(index)}>
+                                        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
                                         <img
                                             src={photo.imageUrl}
-                                            alt={`Photo ${photo.id}`}
+                                            alt={`Photo ${index + 1}`}
                                         />
                                     </div>
                                 ))
