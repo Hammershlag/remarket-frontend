@@ -18,7 +18,6 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
-
         if (!validateIdentifier(identifier)) newErrors.identifier = 'Invalid username/email format';
         if (!password) newErrors.password = 'Password is required';
         setErrors(newErrors);
@@ -27,8 +26,12 @@ function Login() {
             try {
                 const response = await fetch(`http://localhost:8080/api/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usernameOrEmail: identifier, password }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usernameOrEmail: identifier,
+                        password: password }),
                 });
 
                 if (response.ok) {
@@ -56,19 +59,19 @@ function Login() {
                     };
 
                     setUser(newUser);
-                    console.log("Login successful:", newUser);
-                    navigate("/account");
+                    console.log('Login successful:', newUser);
+
+                    navigate('/account');
                 } else {
                     const errorData = await response.json();
                     setErrors({ server: errorData.message });
-                    console.error("Login failed:", errorData);
+                    console.error('Login failed:', errorData);
                 }
             } catch (error) {
-                console.error("Error:", error);
+                console.error('Error:', error);
             }
         }
     };
-
 
     return (
         <div className="AuthPage">

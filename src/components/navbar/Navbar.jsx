@@ -1,12 +1,11 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './Navbar.css';
-import { useUser } from "../../contexts/UserContext";
+import {useUser} from "../../contexts/UserContext";
 
 function Navbar({ theme }) {
     const { user, logout } = useUser();
     const navigate = useNavigate();
-    const role = user?.role?.toUpperCase();
 
     const handleWishlistClick = () => {
         if (user) {
@@ -37,17 +36,13 @@ function Navbar({ theme }) {
 
             <ul className="nav-links">
                 <li>
-                    <button className="nav-button" onClick={handleWishlistClick}>
-                        Wishlist
-                    </button>
+                    <button className="nav-button" onClick={handleWishlistClick}>Wishlist</button>
                 </li>
                 <li>
-                    <button className="nav-button" onClick={handleCartClick}>
-                        Cart
-                    </button>
+                    <button className="nav-button" onClick={handleCartClick}>Cart</button>
                 </li>
 
-                {role === 'ADMIN' ? (
+                {user?.role === 'ADMIN' ? (
                     <li className="dropdown">
                         <button className="nav-button dropbtn">
                             Accounts ⮟
@@ -57,7 +52,7 @@ function Navbar({ theme }) {
                             <Link to="/admin/users">All Accounts</Link>
                         </div>
                     </li>
-                ) : role === 'STUFF' ? (
+                ) : user?.role === 'STUFF' ? (
                     <li className="dropdown">
                         <button className="nav-button dropbtn">
                             Accounts ⮟
@@ -78,17 +73,15 @@ function Navbar({ theme }) {
                     </li>
                 )}
 
+
+
                 {user && (
                     <>
                         <li>
-                            <button className="nav-button" onClick={() => navigate('/orders')}>
-                                Orders
-                            </button>
+                            <button className="nav-button" onClick={() => navigate('/orders')}>Orders</button>
                         </li>
                         <li>
-                            <button className="nav-button" onClick={handleLogoutClick}>
-                                Sign out
-                            </button>
+                            <button className="nav-button" onClick={handleLogoutClick}>Sign out</button>
                         </li>
                     </>
                 )}
@@ -96,5 +89,4 @@ function Navbar({ theme }) {
         </nav>
     );
 }
-
 export default Navbar;

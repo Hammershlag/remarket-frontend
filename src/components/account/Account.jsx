@@ -207,6 +207,7 @@ function Account() {
                         <p>
                             <strong>Role:</strong> {profile.role || "N/A"}
                         </p>
+                        <p><strong>Password:</strong> ********</p>
                     </div>
 
                     {photoUrl && (

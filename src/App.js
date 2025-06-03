@@ -18,6 +18,7 @@ import Orders from "./components/orders/Orders";
 import OrderDetails from "./components/orders/OrderDetails";
 import UserStatistics from "./components/stuff/UserStatistics";
 
+
 function App() {
     const [theme, setTheme] = useState('light');
     const { user } = useUser();
@@ -31,10 +32,8 @@ function App() {
 
     const showNotification = (message) => {
         setNotification(message);
-        setTimeout(() => setNotification(null), 3000);
+        setTimeout(() => setNotification(null), 3000); // Fades away after 3 seconds
     };
-
-    const role = user?.role?.toUpperCase();
 
     return (
         <Router>
@@ -45,31 +44,19 @@ function App() {
                 </button>
 
                 <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <HomePage
-                                wishlistProductIds={wishlistProductIds}
-                                setWishlistProductIds={setWishlistProductIds}
-                                cartProductIds={cartProductIds}
-                                setCartProductIds={setCartProductIds}
-                                showNotification={showNotification}
-                                notification={notification}
-                            />
-                        }
-                    />
-
+                    <Route path="/" element={<HomePage wishlistProductIds={wishlistProductIds}
+                                                       setWishlistProductIds={setWishlistProductIds}
+                                                       cartProductIds={cartProductIds}
+                                                       setCartProductIds={setCartProductIds}
+                                                       showNotification={showNotification}
+                                                       notification={notification}/>} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-
-                    <Route
-                        path="/cart"
-                        element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />}
-                    />
-
-                    <Route path="/seller" element={<Seller />} />
+                    <Route path="/cart" element={<Cart productIds={cartProductIds} setProductIds={setCartProductIds} />} />
+                    <Route path="/seller" element={<Seller/>} />
 
                     <Route path="/admin/users/view" element={<UserDetails />} />
+
 
                     <Route
                         path="/wishlist"
@@ -95,22 +82,24 @@ function App() {
                             </PrivateRoute>
                         }
                     />
-
                     <Route path="/order-details" element={<OrderDetails />} />
-
-                    <Route path="/listing/:id" element={<ListingPage />} />
-
-                    <Route path="/orders" element={<Orders />} />
-
+                    <Route
+                        path="/listing/:id"
+                        element={
+                            <ListingPage></ListingPage>
+                        }/>
+                    <Route path="/orders" element={
+                        <Orders/>
+                    }/>
                     <Route
                         path="/admin/users"
                         element={
-                            user && (role === 'ADMIN' || role === 'STUFF') ? (
+                            user && (user?.role === 'ADMIN' || user?.role ===  'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
                                 </PrivateRoute>
                             ) : (
-                                <Navigate to="/not-authorized" replace />
+                                <Navigate to="/not-authorized" />
                             )
                         }
                     />
@@ -118,7 +107,7 @@ function App() {
                     <Route
                         path="/stuff/statistics/users"
                         element={
-                            role === 'STUFF' ? (
+                            user?.role === 'STUFF' ? (
                                 <PrivateRoute>
                                     <UserStatistics />
                                 </PrivateRoute>
@@ -127,7 +116,6 @@ function App() {
                             )
                         }
                     />
-
 
                     <Route path="/not-authorized" element={<h2>Access Denied</h2>} />
                 </Routes>
