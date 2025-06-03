@@ -18,6 +18,7 @@ function HomePage(props) {
     const [searchQuery, setSearchQuery] = useState('');
     const [priceRange, setPriceRange] = useState([1, 99999]);
     const [initialRange, setInitialRange] = useState([1, 99999]); // Initial range
+    const [selectedCategory, setSelectedCategory] = useState(""); // Lokalny stan dla kategorii
 
     const [priceSort, setPriceSort] = useState('none');
     const [reviewSort, setReviewSort] = useState('none');
@@ -42,7 +43,7 @@ function HomePage(props) {
                 }
 
                 // Filter by category
-                if (props.selectedCategory && listing.categoryId !== props.selectedCategory) {
+                if (selectedCategory && listing.category.id !== parseInt(selectedCategory)) {
                     return false;
                 }
 
@@ -144,7 +145,7 @@ function HomePage(props) {
                     }
 
                     // Filter by category
-                    if (props.selectedCategory && listing.categoryId !== props.selectedCategory) {
+                    if (selectedCategory && listing.category.id !== parseInt(selectedCategory)) {
                         return false;
                     }
 
@@ -223,7 +224,7 @@ function HomePage(props) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchListings();
+        applyFiltersAndSort();
     };
 
     const handlePriceInputChange = (value, index) => {
@@ -335,10 +336,16 @@ function HomePage(props) {
             <div className="listings-container">
                 <div className="sidebar">
                     <form onSubmit={handleSearch}>
-                        <select className="category-dropdown">
+                        <select
+                            className="category-dropdown"
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)} // Użycie lokalnego stanu
+                        >
                             <option value="">All Categories</option>
                             {categories.map((category) => (
-                                <option key={category.id} value={category.id}>{category.name}</option>
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
                             ))}
                         </select>
                         <div className="filter-container">

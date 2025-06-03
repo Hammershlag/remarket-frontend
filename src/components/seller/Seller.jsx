@@ -8,9 +8,11 @@ function Seller() {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [images, setImages] = useState([]);
+    const [photoObjects, setPhotoObjects] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [message, setMessage] = useState("");
+    const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
     useEffect(() => {
         if (!user || !user.token) {
@@ -46,23 +48,25 @@ function Seller() {
         fetchCategories();
     }, [user, selectedCategory]);
 
-    const handleImageChange = (e) => {
-        setImages([...e.target.files]); // Accept multiple files
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage("");
+    const handleImageChange = async (e) => {
+        const files = [...e.target.files];
 
         if (!user || !user.token) {
             setMessage("User is not logged in.");
             return;
         }
 
-        let photoObjects = [];
+        if (files.length === 0) {
+            return;
+        }
+
+        setUploadingPhotos(true);
+        setMessage("Uploading photos...");
 
         try {
-            for (const file of images) {
+            const newPhotoObjects = [];
+
+            for (const file of files) {
                 const photoForm = new FormData();
                 photoForm.append("photo", file);
 
@@ -77,9 +81,31 @@ function Seller() {
                 if (!photoRes.ok) throw new Error("Failed to upload a photo.");
 
                 const photoData = await photoRes.json();
-                photoObjects.push({ id: photoData, data: "", uploader: "test" });
+                newPhotoObjects.push({ id: photoData, data: "", uploader: "test" });
             }
 
+            // Add new photos to existing ones instead of replacing
+            setPhotoObjects(prev => [...prev, ...newPhotoObjects]);
+            setImages(prev => [...prev, ...files]);
+            setMessage("Photos uploaded successfully!");
+        } catch (error) {
+            console.error("Photo upload error:", error);
+            setMessage("Failed to upload photos. Please try again.");
+        } finally {
+            setUploadingPhotos(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setMessage("");
+
+        if (!user || !user.token) {
+            setMessage("User is not logged in.");
+            return;
+        }
+
+        try {
             const listingBody = {
                 title: productName,
                 price: parseFloat(price),
@@ -87,7 +113,7 @@ function Seller() {
                 category: { id: parseInt(selectedCategory), name: "placeholder" },
                 description: description,
                 photos: photoObjects,
-                sellerUsername: user.username, // Użyj nazwy użytkownika z kontekstu
+                sellerUsername: user.username,
             };
 
             const listingRes = await fetch("http://localhost:8080/api/listings", {
@@ -105,6 +131,9 @@ function Seller() {
                 setDescription("");
                 setPrice("");
                 setImages([]);
+                setPhotoObjects([]);
+                // Reset file input
+                document.getElementById('images').value = '';
             } else {
                 const err = await listingRes.json();
                 setMessage(`Error creating listing: ${err.message || "Unknown error"}`);
@@ -176,9 +205,20 @@ function Seller() {
                                     accept="image/*"
                                     multiple
                                     onChange={handleImageChange}
+                                    disabled={uploadingPhotos}
                                 />
+                                {uploadingPhotos && <p>Uploading photos...</p>}
+                                {photoObjects.length > 0 && (
+                                    <p>{photoObjects.length} photo(s) uploaded successfully</p>
+                                )}
                             </div>
-                            <button type="submit" className="seller-button">Create Listing</button>
+                            <button
+                                type="submit"
+                                className="seller-button"
+                                disabled={uploadingPhotos}
+                            >
+                                Create Listing
+                            </button>
                         </form>
                         {message && <p className="message">{message}</p>}
                     </div>
