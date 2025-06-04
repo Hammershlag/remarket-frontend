@@ -59,7 +59,8 @@ function App() {
                     <Route path="/admin/users/view" element={<UserDetails />} />
 
                     <Route path="/stuff/statistics/users" element={<UserStatistics/>} />
-
+                    <Route path="/stuff/flagging/listings" element={<FlaggingListings/>} />
+                    <Route path="/stuff/flagging/reviews" element={<FlaggingReviews/>} />
 
                     <Route
                         path="/wishlist"

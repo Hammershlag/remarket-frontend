@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useUser } from "../../contexts/UserContext";
+import { useUser } from "../../../contexts/UserContext";
 import { Navigate } from "react-router-dom";
 import "./UserStatistics.css";
 

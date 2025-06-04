@@ -48,6 +48,8 @@ function Navbar({ theme }) {
                         <div className="dropdown-content">
                             <Link to="/account">My Account</Link>
                             <Link to="/stuff/statistics/users">Statistics</Link>
+                            <Link to="/stuff/flagging/listings">Flagged Listings</Link>
+                            <Link to="/stuff/flagging/reviews">Flagged Reviews</Link>
                             {user?.role?.toLowerCase() === 'admin' && (
                                 <Link to="/admin/users">All Accounts</Link>
                                 )}
