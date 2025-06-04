@@ -51,7 +51,11 @@ function Navbar({ theme }) {
                             <Link to="/stuff/flagging/listings">Flagged Listings</Link>
                             <Link to="/stuff/flagging/reviews">Flagged Reviews</Link>
                             {user?.role?.toLowerCase() === 'admin' && (
-                                <Link to="/admin/users">All Accounts</Link>
+                                <>
+                                    <Link to="/admin/users">All Accounts</Link>
+                                    <Link to="/admin/flagging/listings">Flagged Listings</Link>
+                                    <Link to="/admin/flagging/reviews">Flagged Reviews</Link>
+                                </>
                                 )}
 
                         </div>
