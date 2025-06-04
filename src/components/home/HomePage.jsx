@@ -93,7 +93,7 @@ function HomePage(props) {
         setLoading(true)
 
         try {
-            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings');
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings?pageSize=99');
             if (!response.ok) {
                 throw new Error("Failed to fetch listings");
             }
