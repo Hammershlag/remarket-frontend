@@ -1,0 +1,204 @@
+/* Container styles */
+.flagging-main-container {
+    padding: 1.5rem;
+}
+
+.flagging-page-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* Error and message styles */
+.flagging-error-message {
+    color: #dc2626;
+}
+
+.flagging-empty-message {
+    color: #6b7280;
+}
+
+.flagging-retry-btn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.flagging-retry-btn:hover {
+    background-color: #2563eb;
+}
+
+/* Listings container */
+.flagging-listings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Individual listing card */
+.flagging-listing-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s;
+}
+
+.flagging-listing-item:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Listing content layout */
+.flagging-item-layout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Image styles */
+.flagging-image-wrapper {
+    flex-shrink: 0;
+}
+
+.flagging-listing-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+}
+
+/* Details container */
+.flagging-listing-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+/* Top row with key info */
+.flagging-info-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Individual detail elements */
+.flagging-item-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    max-width: 20rem;
+}
+
+.flagging-item-price {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #059669;
+    flex-shrink: 0;
+}
+
+.flagging-item-status {
+    background-color: #fef2f2;
+    color: #991b1b;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.flagging-seller-info,
+.flagging-category-info {
+    font-size: 0.875rem;
+    color: #4b5563;
+    flex-shrink: 0;
+}
+
+.flagging-item-description {
+    font-size: 0.875rem;
+    color: #374151;
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+/* Action buttons container */
+.flagging-action-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Base action button styles */
+.flagging-action-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.flagging-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Forward to Admin button */
+.flagging-forward-btn {
+    background-color: #ef4444;
+    color: white;
+}
+
+.flagging-forward-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+.flagging-forward-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Dismiss Flag button */
+.flagging-dismiss-btn {
+    background-color: #10b981;
+    color: white;
+}
+
+.flagging-dismiss-btn:hover:not(:disabled) {
+    background-color: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+.flagging-dismiss-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .flagging-action-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .flagging-action-btn {
+        flex: none;
+    }
+}
