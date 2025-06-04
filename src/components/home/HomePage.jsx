@@ -90,7 +90,7 @@ function HomePage(props) {
 
     const fetchListings = useCallback(async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/listings");
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings');
             if (!response.ok) {
                 throw new Error("Failed to fetch listings");
             }
@@ -114,7 +114,7 @@ function HomePage(props) {
                     if (listing.photos && listing.photos.length > 0) {
                         const photoId = listing.photos[0].id;
                         try {
-                            const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`);
+                            const photoResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/photo/listing/${photoId}`);
                             if (photoResponse.ok) {
                                 const photoBase64 = await photoResponse.json();
                                 const photoUrl = `data:image/jpeg;base64,${photoBase64.data}`;
@@ -231,7 +231,6 @@ function HomePage(props) {
         const newRange = [...priceRange];
         const numValue = Number(value);
 
-        // Ensure the value stays within the initial range bounds
         if (index === 0) {
             // Min value: should not exceed max value and should not go below initial min
             newRange[0] = Math.max(initialRange[0], Math.min(numValue, priceRange[1]));
@@ -261,7 +260,7 @@ function HomePage(props) {
 
     const addToCart = async (id) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/shopping-cart`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/shopping-cart`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -286,7 +285,7 @@ function HomePage(props) {
         const isInWishlist = props.wishlistProductIds.includes(id);
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/wishlist`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/wishlist`, {
                 method: isInWishlist ? "DELETE" : "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

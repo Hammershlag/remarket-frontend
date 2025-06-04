@@ -14,7 +14,7 @@ function Account() {
 
     const fetchProfile = useCallback(async () => {
         try {
-            const res = await fetch(`http://localhost:8080/api/accounts`, {
+            const res = await fetch(process.env.REACT_APP_BASE_URL + '/api/accounts', {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
 
@@ -33,7 +33,7 @@ function Account() {
 
     const fetchPhoto = useCallback(async () => {
         try {
-            const res = await fetch(`http://localhost:8080/api/photo/user`, {
+            const res = await fetch( process.env.REACT_APP_BASE_URL + '/api/photo/user', {
                 headers: { Authorization: `Bearer ${user.token}` },
             });
 
@@ -88,7 +88,7 @@ function Account() {
         if(!editedProfile) return;
 
         try {
-            const res = await fetch(`http://localhost:8080/api/accounts`, {
+            const res = await fetch(process.env.REACT_APP_BASE_URL + '/api/accounts', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ function Account() {
         const method = photoUrl ? "PUT" : "POST";
 
         try {
-            const uploadRes = await fetch("http://localhost:8080/api/photo/user", {
+            const uploadRes = await fetch(process.env.REACT_APP_BASE_URL + '/api/photo/user', {
                 method,
                 headers: {
                     Authorization: `Bearer ${user.token}`,
@@ -176,7 +176,7 @@ function Account() {
         }
 
         try {
-            const res = await fetch("http://localhost:8080/api/accounts/become-seller", {
+            const res = await fetch(process.env.REACT_APP_BASE_URL + '/api/accounts/become-seller', {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -185,7 +185,6 @@ function Account() {
 
             if (res.ok) {
                 alert("You are now a seller!");
-                // Instead of reloading, update the profile state
                 const updatedProfile = { ...profile, role: "seller" };
                 setProfile(updatedProfile);
             } else {
@@ -302,16 +301,19 @@ function Account() {
                     </div>
                 </div>
             ) : (
-                <button onClick={handleSeller}>Seller</button>
+                <></>
             )}
             <div className="button-row">
                 <button onClick={handleLogoutClick}>Sign out</button>
-                {profile?.role === "user" && (
+                {profile?.role === "USER" ? (
                     <button
                         className="request-seller-button"
-                        onClick={handleSellerRequest}
-                    >
+                        onClick={handleSellerRequest}>
                         I want to be a seller
+                    </button>
+                ) : (
+                    <button onClick={handleSeller}>
+                        Seller
                     </button>
                 )}
             </div>

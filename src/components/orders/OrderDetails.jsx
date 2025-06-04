@@ -34,12 +34,10 @@ function OrderDetails() {
         try {
             setLoading(true);
 
-            // Fetch listings for this order
             const listingsWithPhotos = await Promise.all(
                 order.listingIds.map(async (listingId) => {
                     try {
-                        // Fetch listing details
-                        const listingResponse = await fetch(`http://localhost:8080/api/listings/${listingId}`, {
+                        const listingResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${listingId}`, {
                             method: "GET",
                             headers: {
                                 'Authorization': `Bearer ${user.token}`,
@@ -53,12 +51,11 @@ function OrderDetails() {
 
                         const listing = await listingResponse.json();
 
-                        // Fetch photo if available
                         let imageUrl = 'https://placehold.co/400';
                         if (listing.photos && listing.photos.length > 0) {
                             const photoId = listing.photos[0].id;
                             try {
-                                const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`, {
+                                const photoResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/photo/listing/${photoId}`, {
                                     headers: {
                                         'Authorization': `Bearer ${user.token}`,
                                     },
@@ -80,7 +77,7 @@ function OrderDetails() {
                 })
             );
 
-            // Filter out any failed listings
+            // Filter out failed listings
             const validListings = listingsWithPhotos.filter(listing => listing !== null);
             setListings(validListings);
             setError(null);

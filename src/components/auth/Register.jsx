@@ -37,7 +37,7 @@ function Register() {
         }
         
         try {            
-            const response = await fetch(`http://localhost:8080/api/auth/register`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/auth/register', {
                 method: 'POST',                
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,6 +51,7 @@ function Register() {
             });            
             if (response.status === 200) {
                 navigate('/login');
+                alert('Registration successful.');
             } else {
                 const errorData = await response.json();                
                 setErrors({ server: errorData.message });                

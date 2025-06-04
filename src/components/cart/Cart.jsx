@@ -26,7 +26,7 @@ const Cart = ({ productIds, setProductIds }) => {
         try {
             const stripe = await stripePromise;
 
-            const response = await fetch('http://localhost:8080/api/shopping-carts/checkout', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/shopping-carts/checkout', {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -55,7 +55,7 @@ const Cart = ({ productIds, setProductIds }) => {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/shopping-carts', {
+                const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/shopping-carts', {
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
                     },
@@ -70,7 +70,7 @@ const Cart = ({ productIds, setProductIds }) => {
                         if (listing.photos && listing.photos.length > 0) {
                             const photoId = listing.photos[0].id;
                             try {
-                                const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`, {
+                                const photoResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/photo/listing/${photoId}`, {
                                     headers: {
                                         'Authorization': `Bearer ${user.token}`,
                                     },
@@ -113,7 +113,7 @@ const Cart = ({ productIds, setProductIds }) => {
 
     const handleRemoveFromCart = async (id) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/shopping-cart`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/shopping-cart`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -123,7 +123,6 @@ const Cart = ({ productIds, setProductIds }) => {
 
             if (!response.ok) throw new Error('Failed to remove item from cart');
 
-            // Remove from listings and productIds locally
             setListings((prev) => prev.filter(item => item.id !== id));
             setProductIds((prev) => prev.filter(itemId => itemId !== id));
         } catch (error) {
@@ -223,7 +222,5 @@ const Cart = ({ productIds, setProductIds }) => {
         </div>
     );
 };
-
-// TODO: Fix JWT token not visible after redirect from stripe
 
 export default Cart;

@@ -19,7 +19,7 @@ function AdminUserList() {
         const fetchUsers = async () => {
 
             try {
-                const res = await fetch('http://localhost:8080/api/admin/accounts?page=0&size=10', {
+                const res = await fetch(process.env.REACT_APP_BASE_URL + '/api/admin/accounts?page=0&size=10', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -53,7 +53,7 @@ function AdminUserList() {
 
         try {
             const token = user.token;
-            const res = await fetch(`http://localhost:8080/api/admin/accounts/${id}/block`, {
+            const res = await fetch(process.env.REACT_APP_BASE_URL + `/api/admin/accounts/${id}/block`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`

@@ -16,7 +16,9 @@ import UserDetails from './components/account/UserDetails';
 import ListingPage from "./components/listing-page/ListingPage";
 import Orders from "./components/orders/Orders";
 import OrderDetails from "./components/orders/OrderDetails";
-import UserStatistics from "./components/stuff/UserStatistics";
+import UserStatistics from "./components/stuff/userStatistics/UserStatistics";
+import FlaggingListings from "./components/stuff/flagging/listings/FlaggingListings";
+import FlaggingReviews from "./components/stuff/flagging/reviews/FlaggingReviews";
 
 function App() {
     const [theme, setTheme] = useState('light');

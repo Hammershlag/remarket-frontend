@@ -16,7 +16,7 @@ function UserDetails() {
         const fetchPhoto = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:8080/api/photo/user`,
+                    process.env.REACT_APP_BASE_URL + '/api/photo/user',
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
