@@ -47,7 +47,11 @@ function Navbar({ theme }) {
                         <button className="nav-button dropbtn">Accounts ⮟</button>
                         <div className="dropdown-content">
                             <Link to="/account">My Account</Link>
-                            <Link to="/admin/users">All Accounts</Link>
+                            <Link to="/stuff/statistics/users">Statistics</Link>
+                            {user?.role?.toLowerCase() === 'admin' && (
+                                <Link to="/admin/users">All Accounts</Link>
+                                )}
+
                         </div>
                     </li>
                 ) : (

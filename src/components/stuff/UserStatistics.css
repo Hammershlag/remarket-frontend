@@ -1,0 +1,49 @@
+
+.UserStatistics {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.UserStatistics h1 {
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+.us-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.us-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.us-list li:last-child {
+    border-bottom: none;
+}
+
+.us-label {
+    font-weight: 600;
+}
+
+.us-value {
+    font-weight: 400;
+}
+
+.us-loading,
+.us-error,
+.us-empty {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    color: #555;
+}
