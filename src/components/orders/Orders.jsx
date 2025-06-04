@@ -18,7 +18,7 @@ function Orders() {
 
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:8080/api/orders", {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/orders', {
                 method: "GET",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

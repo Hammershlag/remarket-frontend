@@ -22,7 +22,7 @@ function Seller() {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/categories", {
+                const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/categories', {
                     method: "GET",
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -70,7 +70,7 @@ function Seller() {
                 const photoForm = new FormData();
                 photoForm.append("photo", file);
 
-                const photoRes = await fetch("http://localhost:8080/api/photo/listing", {
+                const photoRes = await fetch(process.env.REACT_APP_BASE_URL + '/api/photo/listing', {
                     method: "POST",
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -84,7 +84,6 @@ function Seller() {
                 newPhotoObjects.push({ id: photoData, data: "", uploader: "test" });
             }
 
-            // Add new photos to existing ones instead of replacing
             setPhotoObjects(prev => [...prev, ...newPhotoObjects]);
             setImages(prev => [...prev, ...files]);
             setMessage("Photos uploaded successfully!");
@@ -116,7 +115,7 @@ function Seller() {
                 sellerUsername: user.username,
             };
 
-            const listingRes = await fetch("http://localhost:8080/api/listings", {
+            const listingRes = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings', {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

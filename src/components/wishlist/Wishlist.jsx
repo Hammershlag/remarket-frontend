@@ -9,7 +9,7 @@ function Wishlist(props) {
     useEffect(() => {
         const fetchWishlist = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/wishlists', {
+                const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/wishlists', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -28,7 +28,7 @@ function Wishlist(props) {
                             const photoId = listing.photos[0].id;
                             try {
                                 console.log('Fetching photo for listing:', listing.id);
-                                const photoResponse = await fetch(`http://localhost:8080/api/photo/listing/${photoId}`);
+                                const photoResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/photo/listing/${photoId}`);
                                 if (photoResponse.ok) {
                                     const photoBase64 = await photoResponse.json();
                                     const photoUrl = `data:image/jpeg;base64,${photoBase64.data}`;
@@ -38,8 +38,8 @@ function Wishlist(props) {
                                 console.error(`Failed to fetch photo for listing ${listing.id}:`, error);
                             }
                         }
-                        // Default fallback image if no photos
-                        return { ...listing, imageUrl: 'https://placehold.co/400' }; // <- you can change this
+                        // Fallback image if no photos are available
+                        return { ...listing, imageUrl: 'https://placehold.co/400' };
                     })
                 );
 
@@ -57,7 +57,7 @@ function Wishlist(props) {
 
     const handleAddToCart = async (productId) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${productId}/shopping-cart`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${productId}/shopping-cart`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -81,7 +81,7 @@ function Wishlist(props) {
 
     const handleRemoveFromWishlist = async (productId) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${productId}/wishlist`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${productId}/wishlist`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

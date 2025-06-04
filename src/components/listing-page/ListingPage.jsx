@@ -49,6 +49,7 @@ function ListingPage(props) {
         );
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleKeyPress = (e) => {
         if (selectedPhotoIndex !== null) {
             if (e.key === 'Escape') closePhotoModal();
@@ -64,7 +65,7 @@ function ListingPage(props) {
 
     const addToCart = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/shopping-cart`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/shopping-cart`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -86,7 +87,7 @@ function ListingPage(props) {
 
     const toggleWishlist = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/wishlist`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/wishlist`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -121,7 +122,7 @@ function ListingPage(props) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/review`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/review`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -158,7 +159,7 @@ function ListingPage(props) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/review/${reviewId}`, {
                 method: "DELETE",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -210,7 +211,7 @@ function ListingPage(props) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/review/${reviewId}`, {
                 method: "PUT",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -239,7 +240,7 @@ function ListingPage(props) {
 
     const refreshListing = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}`);
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}`);
             if (response.ok) {
                 const listingData = await response.json();
                 setListing(listingData);
@@ -255,7 +256,7 @@ function ListingPage(props) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/flag`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/flag`, {
                 method: "PUT",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -281,7 +282,7 @@ function ListingPage(props) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/listings/${id}/review/${reviewId}/flag`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}/review/${reviewId}/flag`, {
                 method: "PUT",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -320,7 +321,7 @@ function ListingPage(props) {
     useEffect(() => {
         const fetchListing = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/listings/${id}`);
+                const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${id}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch listing details");
                 }
@@ -334,7 +335,7 @@ function ListingPage(props) {
 
         const fetchPhotos = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/photo/listing/listing/${id}`);
+                const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/photo/listing/listing/${id}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch listing photos");
                 }
