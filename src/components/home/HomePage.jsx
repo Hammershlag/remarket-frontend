@@ -14,11 +14,11 @@ function HomePage(props) {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [listings, setListings] = useState([]);
-    const [allListings, setAllListings] = useState([]); // Store all listings
+    const [allListings, setAllListings] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [priceRange, setPriceRange] = useState([1, 99999]);
-    const [initialRange, setInitialRange] = useState([1, 99999]); // Initial range
-    const [selectedCategory, setSelectedCategory] = useState(""); // Lokalny stan dla kategorii
+    const [initialRange, setInitialRange] = useState([1, 99999]);
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     const [priceSort, setPriceSort] = useState('none');
     const [reviewSort, setReviewSort] = useState('none');
