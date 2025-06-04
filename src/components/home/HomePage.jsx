@@ -19,6 +19,7 @@ function HomePage(props) {
     const [priceRange, setPriceRange] = useState([1, 99999]);
     const [initialRange, setInitialRange] = useState([1, 99999]);
     const [selectedCategory, setSelectedCategory] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const [priceSort, setPriceSort] = useState('none');
     const [reviewSort, setReviewSort] = useState('none');
@@ -89,6 +90,8 @@ function HomePage(props) {
     }
 
     const fetchListings = useCallback(async () => {
+        setLoading(true)
+
         try {
             const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings');
             if (!response.ok) {
@@ -190,6 +193,8 @@ function HomePage(props) {
             setListings(filteredListings);
         } catch (error) {
             console.error("Error fetching listings:", error);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
@@ -420,6 +425,11 @@ function HomePage(props) {
 
                 <div className="vertical-separator"></div>
 
+                {loading ? (
+                    <div className="spinner-container">
+                        <span className="spinner"></span>
+                    </div>
+                    ) : (
                 <div className="product-sections">
                     <fieldset>
                         <div className="product-listings">
@@ -455,6 +465,7 @@ function HomePage(props) {
                         </div>
                     </fieldset>
                 </div>
+                )}
             </div>
         </div>
     );
