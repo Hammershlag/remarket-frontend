@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import './AdminUser.css';
-import { useUser } from '../../contexts/UserContext';
+import { useUser } from '../../../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function AdminUserList() {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
-    const [suspendedEmails] = useState([]);
     const { user } = useUser();
-    const role = user?.role?.toLowerCase();
+    const token = user.token;
+    const role = user?.role;
 
     useEffect(() => {
-        if (!user || !user.token) {
+        if (!user || !token) {
             console.warn("User or token not available yet.");
             return;
         }
-        console.log("Sending token:", user?.token);
+
         const fetchUsers = async () => {
-            const token = user.token;
 
             try {
-                const res = await fetch('http://localhost:8080/api/admin/accounts?page=0&size=10', {
+                const res = await fetch(process.env.REACT_APP_BASE_URL + '/api/admin/accounts?page=0&size=10', {
                     headers: {
-                        //'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     }
                 });
 
                 if (!res.ok) {
-                    console.error('Failed to fetch users');
+                    console.error('Failed to fetch users: ', res.status);
                     return;
                 }
 
@@ -40,9 +38,9 @@ function AdminUserList() {
         };
 
         fetchUsers();
-    }, [user]);
+    }, [token, user]);
 
-    if (role === 'user' || role === 'seller') {
+    if (role === 'USER' || role === 'SELLER') {
         return <p>You are not authorized to view this page.</p>;
     }
 
@@ -55,7 +53,7 @@ function AdminUserList() {
 
         try {
             const token = user.token;
-            const res = await fetch(`http://localhost:8080/api/admin/accounts/${id}/block`, {
+            const res = await fetch(process.env.REACT_APP_BASE_URL + `/api/admin/accounts/${id}/block`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -64,43 +62,21 @@ function AdminUserList() {
 
             if (res.ok) {
                 setUsers(prev =>
-                    prev.map(u => u.id === id ? { ...u, status: 'BLOCKED' } : u)
+                    prev.map(u =>
+                        u.id === id
+                            ? { ...u, status: u.status === 'DISABLED' ? 'ACTIVE' : 'DISABLED' }
+                            : u
+                    )
                 );
-                alert('User suspended successfully.');
+                alert(`User ${users.find(u => u.id === id).status === 'DISABLED' ? 'unsuspended' : 'suspended'} successfully.`);
             } else {
-                alert("Failed to suspend user.");
+                alert("Failed to update user status.");
             }
         } catch (err) {
             console.error("Error suspending user:", err);
             alert("An error occurred.");
         }
     };
-
-
-    const handleDelete = async (email) => {
-        if (!window.confirm("Are you sure you want to delete this user?")) return;
-
-        try {
-            const token = user.token;
-            const res = await fetch(`http://localhost:8080/api/accounts`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.status === 204) {
-                setUsers(prev => prev.filter(u => u.email !== email));
-                alert('User deleted.');
-            } else {
-                alert('Failed to delete user.');
-            }
-        } catch (err) {
-            console.error('Error deleting user:', err);
-            alert('An error occurred.');
-        }
-    };
-
 
     return (
         <div className="AdminUserList">
@@ -111,31 +87,31 @@ function AdminUserList() {
                     <th>Username</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {users.map(u => {
-                    const email = typeof u.email === 'string' ? u.email : u.email?.value || '';
                     return (
-                        <tr key={email}>
+                        <tr key={u.email}>
                             <td>{u.username}</td>
-                            <td>{email}</td>
+                            <td>{u.email}</td>
                             <td>{u.role}</td>
+                            <td>{u.status}</td>
                             <td className="action-buttons">
-                                {(role === 'admin' || role === 'stuff') && (
+                                {(role === 'ADMIN' || role === 'STUFF') && (
                                     <>
                                         <button onClick={() => handleView(u)}>View</button>
-                                        {role === 'admin' && (
+                                        {role === 'ADMIN' && (
                                             <>
-                                                {suspendedEmails.includes(email) ? (
-                                                    <button style={{ backgroundColor: "red", color: "white" }} disabled>
-                                                        Suspended
+                                                {u.status === 'DISABLED' ? (
+                                                    <button style={{ backgroundColor: "#a71e2a", color: "white" }} onClick={() => handleSuspend(u.id)}>
+                                                        Unsuspend
                                                     </button>
                                                 ) : (
                                                     <button onClick={() => handleSuspend(u.id)}>Suspend</button>
                                                 )}
-                                                <button onClick={() => handleDelete(email)}>Delete</button>
                                             </>
                                         )}
                                     </>

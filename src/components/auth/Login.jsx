@@ -24,7 +24,7 @@ function Login() {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await fetch(`http://localhost:8080/api/auth/login`, {
+                const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ function Login() {
                 if (response.ok) {
                     const data = await response.json();
 
-                    const userResponse = await fetch(`http://localhost:8080/api/accounts`, {
+                    const userResponse = await fetch(process.env.REACT_APP_BASE_URL + '/api/accounts', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${data.accessToken}`,

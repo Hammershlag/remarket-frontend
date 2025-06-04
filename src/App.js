@@ -9,11 +9,18 @@ import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import HomePage from "./components/home/HomePage";
 import PrivateRoute from "./components/PrivateRoute";
-import AdminUserList from './components/account/AdminUser';
+import AdminUserList from './components/admin/user/AdminUser';
 import { useUser } from './contexts/UserContext';
 import Seller from "./components/seller/Seller";
 import UserDetails from './components/account/UserDetails';
 import ListingPage from "./components/listing-page/ListingPage";
+import Orders from "./components/orders/Orders";
+import OrderDetails from "./components/orders/OrderDetails";
+import UserStatistics from "./components/stuff/userStatistics/UserStatistics";
+import FlaggingListings from "./components/stuff/flagging/listings/FlaggingListings";
+import FlaggingReviews from "./components/stuff/flagging/reviews/FlaggingReviews";
+import AdminFlaggingListings from "./components/admin/listings/AdminFlaggingListings";
+import AdminFlaggingReviews from "./components/admin/reviews/AdminFlaggingReviews";
 
 function App() {
     const [theme, setTheme] = useState('light');
@@ -53,6 +60,12 @@ function App() {
 
                     <Route path="/admin/users/view" element={<UserDetails />} />
 
+                    <Route path="/stuff/statistics/users" element={<UserStatistics/>} />
+                    <Route path="/stuff/flagging/listings" element={<FlaggingListings/>} />
+                    <Route path="/stuff/flagging/reviews" element={<FlaggingReviews/>} />
+
+                    <Route path="/admin/flagging/listings" element={<AdminFlaggingListings/>} />
+                    <Route path="/admin/flagging/reviews" element={<AdminFlaggingReviews/>} />
 
                     <Route
                         path="/wishlist"
@@ -78,16 +91,19 @@ function App() {
                             </PrivateRoute>
                         }
                     />
+                    <Route path="/order-details" element={<OrderDetails />} />
                     <Route
                         path="/listing/:id"
                         element={
                             <ListingPage></ListingPage>
                         }/>
-
+                    <Route path="/orders" element={
+                        <Orders/>
+                    }/>
                     <Route
                         path="/admin/users"
                         element={
-                            user && (user.role === 'admin' || user.role === 'stuff') ? (
+                            user && (user.role === 'ADMIN' || user.role === 'STUFF') ? (
                                 <PrivateRoute>
                                     <AdminUserList />
                                 </PrivateRoute>

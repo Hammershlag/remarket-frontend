@@ -8,9 +8,11 @@ function Seller() {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [images, setImages] = useState([]);
+    const [photoObjects, setPhotoObjects] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [message, setMessage] = useState("");
+    const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
     useEffect(() => {
         if (!user || !user.token) {
@@ -20,7 +22,7 @@ function Seller() {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/categories", {
+                const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/categories', {
                     method: "GET",
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -46,8 +48,51 @@ function Seller() {
         fetchCategories();
     }, [user, selectedCategory]);
 
-    const handleImageChange = (e) => {
-        setImages([...e.target.files]); // Accept multiple files
+    const handleImageChange = async (e) => {
+        const files = [...e.target.files];
+
+        if (!user || !user.token) {
+            setMessage("User is not logged in.");
+            return;
+        }
+
+        if (files.length === 0) {
+            return;
+        }
+
+        setUploadingPhotos(true);
+        setMessage("Uploading photos...");
+
+        try {
+            const newPhotoObjects = [];
+
+            for (const file of files) {
+                const photoForm = new FormData();
+                photoForm.append("photo", file);
+
+                const photoRes = await fetch(process.env.REACT_APP_BASE_URL + '/api/photo/listing', {
+                    method: "POST",
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                    },
+                    body: photoForm,
+                });
+
+                if (!photoRes.ok) throw new Error("Failed to upload a photo.");
+
+                const photoData = await photoRes.json();
+                newPhotoObjects.push({ id: photoData, data: "", uploader: "test" });
+            }
+
+            setPhotoObjects(prev => [...prev, ...newPhotoObjects]);
+            setImages(prev => [...prev, ...files]);
+            setMessage("Photos uploaded successfully!");
+        } catch (error) {
+            console.error("Photo upload error:", error);
+            setMessage("Failed to upload photos. Please try again.");
+        } finally {
+            setUploadingPhotos(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -59,27 +104,7 @@ function Seller() {
             return;
         }
 
-        let photoObjects = [];
-
         try {
-            for (const file of images) {
-                const photoForm = new FormData();
-                photoForm.append("photo", file);
-
-                const photoRes = await fetch("http://localhost:8080/api/photo/listing", {
-                    method: "POST",
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                    },
-                    body: photoForm,
-                });
-
-                if (!photoRes.ok) throw new Error("Failed to upload a photo.");
-
-                const photoData = await photoRes.json();
-                photoObjects.push({ id: photoData, data: "", uploader: "test" });
-            }
-
             const listingBody = {
                 title: productName,
                 price: parseFloat(price),
@@ -87,10 +112,10 @@ function Seller() {
                 category: { id: parseInt(selectedCategory), name: "placeholder" },
                 description: description,
                 photos: photoObjects,
-                sellerUsername: user.username, // Użyj nazwy użytkownika z kontekstu
+                sellerUsername: user.username,
             };
 
-            const listingRes = await fetch("http://localhost:8080/api/listings", {
+            const listingRes = await fetch(process.env.REACT_APP_BASE_URL + '/api/listings', {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -105,6 +130,9 @@ function Seller() {
                 setDescription("");
                 setPrice("");
                 setImages([]);
+                setPhotoObjects([]);
+                // Reset file input
+                document.getElementById('images').value = '';
             } else {
                 const err = await listingRes.json();
                 setMessage(`Error creating listing: ${err.message || "Unknown error"}`);
@@ -176,9 +204,20 @@ function Seller() {
                                     accept="image/*"
                                     multiple
                                     onChange={handleImageChange}
+                                    disabled={uploadingPhotos}
                                 />
+                                {uploadingPhotos && <p>Uploading photos...</p>}
+                                {photoObjects.length > 0 && (
+                                    <p>{photoObjects.length} photo(s) uploaded successfully</p>
+                                )}
                             </div>
-                            <button type="submit" className="seller-button">Create Listing</button>
+                            <button
+                                type="submit"
+                                className="seller-button"
+                                disabled={uploadingPhotos}
+                            >
+                                Create Listing
+                            </button>
                         </form>
                         {message && <p className="message">{message}</p>}
                     </div>

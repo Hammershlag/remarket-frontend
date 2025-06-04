@@ -16,7 +16,11 @@ function Navbar({ theme }) {
     };
 
     const handleCartClick = () => {
-        navigate('/cart');
+        if (user) {
+            navigate('/cart');
+        } else {
+            navigate('/login');
+        }
     };
 
     const handleLogoutClick = () => {
@@ -43,7 +47,23 @@ function Navbar({ theme }) {
                         <button className="nav-button dropbtn">Accounts ⮟</button>
                         <div className="dropdown-content">
                             <Link to="/account">My Account</Link>
-                            <Link to="/admin/users">All Accounts</Link>
+                            <hr style={{color: "white"}} />
+                            <hr style={{color: "white"}} />
+                            <h4 style={{color: "white"}}>Stuff</h4>
+                            <Link to="/stuff/statistics/users">Statistics</Link>
+                            <Link to="/stuff/flagging/listings">Flagged Listings</Link>
+                            <Link to="/stuff/flagging/reviews">Flagged Reviews</Link>
+                            {user?.role?.toLowerCase() === 'admin' && (
+                                <>
+                                    <hr style={{color: "white"}} />
+                                    <hr style={{color: "white"}} />
+                                    <h4 style={{color: "white"}}>Admin</h4>
+                                    <Link to="/admin/users">All Accounts</Link>
+                                    <Link to="/admin/flagging/listings">Flagged Listings</Link>
+                                    <Link to="/admin/flagging/reviews">Flagged Reviews</Link>
+                                </>
+                                )}
+
                         </div>
                     </li>
                 ) : (
@@ -57,9 +77,14 @@ function Navbar({ theme }) {
 
 
                 {user && (
-                    <li>
-                        <button className="nav-button" onClick={handleLogoutClick}>Sign out</button>
-                    </li>
+                    <>
+                        <li>
+                            <button className="nav-button" onClick={() => navigate('/orders')}>Orders</button>
+                        </li>
+                        <li>
+                            <button className="nav-button" onClick={handleLogoutClick}>Sign out</button>
+                        </li>
+                    </>
                 )}
             </ul>
         </nav>

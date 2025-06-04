@@ -14,12 +14,13 @@ function Register() {
     const validateEmail = (email) => {        
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;        
         return emailRegex.test(email);    
-    };       
-    const validatePassword = (password) => {       
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;        
+    };
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return passwordRegex.test(password);
-    };    
-    
+    };
+
+
     const handleSubmit = async (e) => {       
         e.preventDefault();        
         const newErrors = {};        
@@ -36,7 +37,7 @@ function Register() {
         }
         
         try {            
-            const response = await fetch(`http://localhost:8080/api/auth/register`, {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/auth/register', {
                 method: 'POST',                
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,6 +51,7 @@ function Register() {
             });            
             if (response.status === 200) {
                 navigate('/login');
+                alert('Registration successful.');
             } else {
                 const errorData = await response.json();                
                 setErrors({ server: errorData.message });                
