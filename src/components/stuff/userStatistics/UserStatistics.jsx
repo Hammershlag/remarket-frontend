@@ -13,7 +13,7 @@ export default function UserStatistics() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (role !== "STUFF" || !token) return;
+        if ((role !== "STUFF" && role !== "ADMIN")  || !token) return;
 
         const fetchStats = async () => {
             setLoading(true);
@@ -40,7 +40,7 @@ export default function UserStatistics() {
 
 
 
-    if (role !== "STUFF") return <Navigate to="/not-authorized" replace />;
+    if (role !== "STUFF" && role !== "ADMIN") return <Navigate to="/not-authorized" replace />;
     if (loading) return <div className="us-loading">Loading statistics…</div>;
     if (error) return <div className="us-error">{error}</div>;
     if (!stats) return <div className="us-empty">No statistics to display.</div>;
