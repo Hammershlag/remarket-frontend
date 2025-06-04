@@ -339,7 +339,7 @@ function HomePage(props) {
                         <select
                             className="category-dropdown"
                             value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)} // Użycie lokalnego stanu
+                            onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">All Categories</option>
                             {categories.map((category) => (
