@@ -200,7 +200,7 @@ function HomePage(props) {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/api/categories`);
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/categories`);
             if (response.ok) {
                 const data = await response.json();
                 setCategories(data);
