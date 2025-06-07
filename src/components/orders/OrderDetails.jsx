@@ -131,6 +131,34 @@ function OrderDetails() {
         });
     };
 
+    const handleShipOrder = ( async (id) => {
+        if (!user || !user.token) {
+            setError("User not authenticated");
+            return;
+        }
+
+        try {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + `/api/seller/orders/${id}/status`, {
+                method: "PUT",
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch seller orders: ${response.status}`);
+            }
+
+            setListingOrders((prevOrders) => prevOrders.map(order => order.id === id ? {...order, listingStatus: 'SHIPPED'} : order));
+            setError(null);
+            alert("Order has been shipped successfully!");
+        } catch (err) {
+            console.error("Error fetching seller orders:", err);
+            setError(err.message);
+        }
+    });
+
     if (loading) {
         return (
             <div className="order-details">
@@ -201,7 +229,7 @@ function OrderDetails() {
                     <h1>Order #{order.id}</h1>
                     <div className="order-meta">
                         <span>
-                            📅 Order Date: {formatDate(order.createdAt)}
+                            📅 Order Date: {formatDate(order.shippedDate)}
                         </span>
                         <span>
                             🚚 Shipping: {order.shippingMethod}
@@ -309,7 +337,6 @@ function OrderDetails() {
                                             <div className="listing-price">
                                                 {listingOrder.listing.price} PLN
                                             </div>
-                                            {/*TODO add styling here*/}
                                             <div className="listing-status-order">
                                                 <span className={`listing-status ${getStatusColor(listingOrder.listingStatus)}`}>
                                                     {listingOrder.listingStatus}
@@ -322,6 +349,11 @@ function OrderDetails() {
                                             )}
                                         </div>
                                     </div>
+                                    {user?.role !== 'USER' && listingOrder.listingStatus === 'SHIPPING' && (
+                                        <button onClick={() => handleShipOrder(listingOrder.id)} >
+                                            Ship product to the client
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         )}
