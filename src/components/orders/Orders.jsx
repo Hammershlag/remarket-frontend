@@ -170,7 +170,7 @@ function Orders() {
                             </div>
 
                             <div className="order-items">
-                                <p><strong>Items:</strong> {order.listingIds.length} item{order.listingIds.length !== 1 ? 's' : ''}</p>
+                                <p><strong>Items:</strong> {order.listingOrders.length} item{order.listingOrders.length !== 1 ? 's' : ''}</p>
                                 <button
                                     onClick={() => navigate('/order-details', { state: { order } })}
                                     style={{

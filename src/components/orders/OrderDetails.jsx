@@ -5,7 +5,7 @@ import './OrderDetails.css';
 
 function OrderDetails() {
     const [order, setOrder] = useState(null);
-    const [listings, setListings] = useState([]);
+    const [listingOrders, setListingOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const location = useLocation();
@@ -34,8 +34,9 @@ function OrderDetails() {
         try {
             setLoading(true);
 
-            const listingsWithPhotos = await Promise.all(
-                order.listingIds.map(async (listingId) => {
+            const listingOrdersWithPhotos = await Promise.all(
+                order.listingOrders.map(async (listingOrder) => {
+                    const listingId = listingOrder.listing.id;
                     try {
                         const listingResponse = await fetch(process.env.REACT_APP_BASE_URL + `/api/listings/${listingId}`, {
                             method: "GET",
@@ -69,7 +70,11 @@ function OrderDetails() {
                             }
                         }
 
-                        return { ...listing, imageUrl };
+                        // Return the listingOrder with updated listing that includes imageUrl
+                        return {
+                            ...listingOrder,
+                            listing: { ...listing, imageUrl }
+                        };
                     } catch (listingError) {
                         console.error(`Error fetching listing ${listingId}:`, listingError);
                         return null;
@@ -78,8 +83,8 @@ function OrderDetails() {
             );
 
             // Filter out failed listings
-            const validListings = listingsWithPhotos.filter(listing => listing !== null);
-            setListings(validListings);
+            const validListingOrders = listingOrdersWithPhotos.filter(listingOrder => listingOrder !== null);
+            setListingOrders(validListingOrders);
             setError(null);
 
         } catch (err) {
@@ -202,7 +207,7 @@ function OrderDetails() {
                             🚚 Shipping: {order.shippingMethod}
                         </span>
                         <span>
-                            📦 Items: {listings.length}
+                            📦 Items: {listingOrders.length}
                         </span>
                     </div>
                 </div>
@@ -276,14 +281,14 @@ function OrderDetails() {
                         <h2>Order Items</h2>
                     </div>
                     <div className="listings-grid">
-                        {listings.length === 0 ? (
+                        {listingOrders.length === 0 ? (
                             <div className="no-items">No items found for this order.</div>
                         ) : (
-                            listings.map((listing) => (
-                                <div key={listing.id} className="listing-item">
+                            listingOrders.map((listingOrder) => (
+                                <div key={listingOrder.id} className="listing-item">
                                     <img
-                                        src={listing.imageUrl}
-                                        alt={listing.title}
+                                        src={listingOrder.listing.imageUrl}
+                                        alt={listingOrder.listing.title}
                                         className="listing-image"
                                         onError={(e) => {
                                             e.target.src = 'https://placehold.co/400';
@@ -292,21 +297,27 @@ function OrderDetails() {
                                     <div className="listing-details">
                                         <div className="listing-info">
                                             <h4 className="listing-title">
-                                                {listing.title}
+                                                {listingOrder.listing.title}
                                             </h4>
-                                            {listing.description && (
+                                            {listingOrder.listing.description && (
                                                 <p className="listing-description">
-                                                    {listing.description}
+                                                    {listingOrder.listing.description}
                                                 </p>
                                             )}
                                         </div>
                                         <div className="listing-price-section">
                                             <div className="listing-price">
-                                                {listing.price} PLN
+                                                {listingOrder.listing.price} PLN
                                             </div>
-                                            {listing.averageRating && listing.averageRating > 1 && (
+                                            {/*TODO add styling here*/}
+                                            <div className="listing-status-order">
+                                                <span className={`listing-status ${getStatusColor(listingOrder.listingStatus)}`}>
+                                                    {listingOrder.listingStatus}
+                                                </span>
+                                            </div>
+                                            {listingOrder.listing.averageRating && listingOrder.listing.averageRating > 0 && (
                                                 <div className="listing-rating">
-                                                    ⭐ {listing.averageRating.toFixed(1)}
+                                                    ⭐ {listingOrder.listing.averageRating.toFixed(1)}
                                                 </div>
                                             )}
                                         </div>
